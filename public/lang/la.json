@@ -1,0 +1,69 @@
+{
+  "title": "Generator Chartarum Locomotivarum",
+  "resetUpload": "Fasciculum novum imposuere",
+
+  "loadingSqlite": "Machina SQLite onerans...",
+  "loadingReady": "Paratum!",
+  "loadingError": "Error onerationis. Paginam refrica.",
+  "loadingComponents": "Partes onerans...",
+
+  "step1Title": "I. Elige tuum Z21-Backup",
+  "step1Desc": "Fac exemplar locomotivarum tuarum in <strong>App Z21</strong> et hic aperi.",
+  "dropzoneText": "Fasciculum huc trahe",
+  "dropzoneSubtext": "vel clicca ad eligendum",
+  "privacyNote": "Data tua in machina tua manent – nihil ad interrete mittitur.",
+  "processingBackup": "Backup tractans...",
+  "invalidFileType": "Quaeso fasciculum .z21 vel .zip elige.",
+  "errorPrefix": "Error:",
+
+  "step2Title": "II. Accommoda et Exporta",
+
+  "cardSize": "Magnitudo Chartae",
+  "cardWidth": "Latitudo (cm):",
+  "cardHeight": "Altitudo (cm):",
+
+  "addressStyle": "Stilus Inscriptionis",
+  "styleLabel": "Stilus:",
+  "styleCircle": "Circulus",
+  "styleRotatedRight": "Rotatum Dextrum",
+  "styleRotatedLeft": "Rotatum Sinistrum",
+  "sidePadding": "Spatium Laterale (%):",
+
+  "circleDetails": "Particularia Circuli",
+  "circleSize": "Magnitudo (mm):",
+  "position": "Positio:",
+  "posTopRight": "Superior Dextra",
+  "posTopLeft": "Superior Sinistra",
+  "posBottomRight": "Inferior Dextra",
+  "posBottomLeft": "Inferior Sinistra",
+
+  "colorsFont": "Colores et Scriptura",
+  "bgColor": "Fundus:",
+  "textColor": "Textus:",
+  "fontSize": "Magnitudo Scripturae (px):",
+
+  "export": "Exportare",
+  "paperFormat": "Forma Chartae:",
+  "generatePdf": "PDF generare",
+  "generating": "Generans...",
+
+  "preview": "Praevisio",
+  "loadingPreview": "Praevisionem onerans...",
+  "noLokPreview": "Nulla locomotiva ad praevisionem.",
+  "previewError": "Error in praevisione.",
+
+  "selectAll": "Omnia eligere",
+  "deselectAll": "Omnia deligere",
+  "selectUnprinted": "Solum non impressa",
+  "loadingLoks": "Locomotivas onerans...",
+
+  "address": "Inscriptio:",
+  "noImage": "Nulla imago",
+
+  "selectAtLeastOne": "Quaeso unam locomotivam minimum elige.",
+  "pdfError": "Error in PDF creando.",
+
+  "noValidFormat": "Nullum validum Z21 formatum inventum.",
+  "locoNotFound": "Loco.sqlite non inventum.",
+  "sqlLoadError": "sql.js onerare non potuit"
+}

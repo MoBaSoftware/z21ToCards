@@ -1,0 +1,69 @@
+{
+  "title": "Lok-Karten Generator",
+  "resetUpload": "Neue Datei hochladen",
+
+  "loadingSqlite": "Lade SQLite Engine...",
+  "loadingReady": "Bereit!",
+  "loadingError": "Fehler beim Laden. Bitte Seite neu laden.",
+  "loadingComponents": "Lade Komponenten...",
+
+  "step1Title": "1. Wähle dein Z21-Backup",
+  "step1Desc": "Erstelle in der <strong>Z21-App</strong> ein Backup deiner Lokomotiven und öffne es hier.",
+  "dropzoneText": "Backup-Datei hier ablegen",
+  "dropzoneSubtext": "oder klicken zum Auswählen",
+  "privacyNote": "Deine Daten bleiben auf deinem Gerät – es wird nichts ins Internet übertragen.",
+  "processingBackup": "Verarbeite Backup...",
+  "invalidFileType": "Bitte eine .z21 oder .zip Datei wählen.",
+  "errorPrefix": "Fehler:",
+
+  "step2Title": "2. Anpassen und Exportieren",
+
+  "cardSize": "Karten-Größe",
+  "cardWidth": "Breite (cm):",
+  "cardHeight": "Höhe (cm):",
+
+  "addressStyle": "Adressen-Stil",
+  "styleLabel": "Stil:",
+  "styleCircle": "Kreis",
+  "styleRotatedRight": "Gedreht Rechts",
+  "styleRotatedLeft": "Gedreht Links",
+  "sidePadding": "Seiten-Abstand (%):",
+
+  "circleDetails": "Kreis-Details",
+  "circleSize": "Größe (mm):",
+  "position": "Position:",
+  "posTopRight": "Oben Rechts",
+  "posTopLeft": "Oben Links",
+  "posBottomRight": "Unten Rechts",
+  "posBottomLeft": "Unten Links",
+
+  "colorsFont": "Farben & Schrift",
+  "bgColor": "Hintergrund:",
+  "textColor": "Schrift:",
+  "fontSize": "Schriftgröße (px):",
+
+  "export": "Export",
+  "paperFormat": "Papierformat:",
+  "generatePdf": "PDF generieren",
+  "generating": "Generiere...",
+
+  "preview": "Vorschau",
+  "loadingPreview": "Lade Vorschau...",
+  "noLokPreview": "Keine Lok für Vorschau.",
+  "previewError": "Fehler bei Vorschau.",
+
+  "selectAll": "Alle auswählen",
+  "deselectAll": "Alle abwählen",
+  "selectUnprinted": "Nur ungedruckte",
+  "loadingLoks": "Lade Loks...",
+
+  "address": "Adresse:",
+  "noImage": "Kein Bild",
+
+  "selectAtLeastOne": "Bitte wähle mindestens eine Lok aus.",
+  "pdfError": "Fehler beim Erstellen des PDFs.",
+
+  "noValidFormat": "Kein gültiges Z21-Export-Format gefunden.",
+  "locoNotFound": "Loco.sqlite nicht gefunden.",
+  "sqlLoadError": "sql.js konnte nicht geladen werden"
+}

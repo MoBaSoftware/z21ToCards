@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design-Vorschau - Lok-Karten Generator</title>
+    <link rel="stylesheet" href="style-cozy.css" id="theme-stylesheet">
+    <style>
+        /* Style Switcher Panel */
+        .style-switcher {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background: white;
+            padding: 1rem;
+            border-radius: 12px 0 0 12px;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .style-switcher h3 {
+            margin: 0 0 0.75rem 0;
+            font-size: 0.85rem;
+            color: #333;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .style-btn {
+            padding: 0.6rem 1rem;
+            border: 2px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .style-btn:hover {
+            border-color: #888;
+        }
+
+        .style-btn.active {
+            border-color: #d63031;
+            background: #fff5f5;
+        }
+
+        .style-btn .style-name {
+            font-weight: 600;
+            display: block;
+        }
+
+        .style-btn .style-desc {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        /* Ensure main app content is visible */
+        #app {
+            display: block !important;
+        }
+
+        #loading-screen {
+            display: none !important;
+        }
+
+        /* Sample lok cards for preview */
+        .sample-image {
+            width: 100%;
+            height: 140px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<!-- Style Switcher -->
+<div class="style-switcher">
+    <h3>Design wählen</h3>
+    <button class="style-btn" data-style="style-vintage.css">
+        <span class="style-name">Vintage</span>
+        <span class="style-desc">Eisenbahn-Nostalgie</span>
+    </button>
+    <button class="style-btn" data-style="style-industrial.css">
+        <span class="style-name">Industrial</span>
+        <span class="style-desc">Stahl & Präzision</span>
+    </button>
+    <button class="style-btn active" data-style="style-cozy.css">
+        <span class="style-name">Gemütlich</span>
+        <span class="style-desc">Hobby-Werkstatt</span>
+    </button>
+</div>
+
+<div id="app">
+    <header>
+        <h1>Lok-Karten Generator</h1>
+        <div class="header-track">
+            <div class="trees" id="header-trees"></div>
+            <div class="track-line"></div>
+            <div class="train">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <div class="locomotive-container">
+                    <img src="icons8-lokomotive-emoji-100.png" class="locomotive" alt="Lokomotive">
+                    <div class="smoke-container">
+                        <div class="smoke-puff"></div>
+                        <div class="smoke-puff"></div>
+                        <div class="smoke-puff"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button id="reset-upload-btn">Neue Datei hochladen</button>
+        <a href="https://icons8.com" target="_blank" class="icons8-link header-icons8">Icons by Icons8</a>
+    </header>
+
+    <main>
+        <!-- Upload Section Preview -->
+        <div id="upload-section">
+            <h2>1. Wähle dein Z21-Backup</h2>
+            <p>Erstelle in der <strong>Z21-App</strong> ein Backup deiner Lokomotiven und öffne es hier.</p>
+
+            <div id="dropzone">
+                <div class="dropzone-content">
+                    <span class="dropzone-icon">📂</span>
+                    <p class="dropzone-text">Backup-Datei hier ablegen</p>
+                    <p class="dropzone-subtext">oder klicken zum Auswählen</p>
+                </div>
+            </div>
+
+            <div id="upload-status">Bereit zum Hochladen</div>
+
+            <div class="privacy-note">
+                <span>🔒</span>
+                <span>Deine Daten bleiben auf deinem Gerät – es wird nichts ins Internet übertragen.</span>
+            </div>
+        </div>
+
+        <!-- Main App Content Preview -->
+        <div id="main-app-content" style="margin-top: 2rem;">
+            <h2>2. Anpassen und Exportieren</h2>
+            <form id="lok-form">
+                <div class="controls">
+                    <fieldset>
+                        <legend>Karten-Größe</legend>
+                        <div class="setting">
+                            <label for="card-width">Breite (cm): <span>4</span></label>
+                            <input type="range" id="card-width" min="2" max="10" value="4" step="0.5">
+                        </div>
+                        <div class="setting">
+                            <label for="card-height">Höhe (cm): <span>2</span></label>
+                            <input type="range" id="card-height" min="1" max="10" value="2" step="0.5">
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Adressen-Stil</legend>
+                        <div class="setting">
+                            <label>Stil:</label>
+                            <select>
+                                <option value="circle">Kreis</option>
+                                <option value="rotated-right" selected>Gedreht Rechts</option>
+                                <option value="rotated-left">Gedreht Links</option>
+                            </select>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Farben & Schrift</legend>
+                        <div class="setting">
+                            <label for="bg-color">Hintergrund:</label>
+                            <input type="color" id="bg-color" value="#d32f2f">
+                        </div>
+                        <div class="setting">
+                            <label for="text-color">Schrift:</label>
+                            <input type="color" id="text-color" value="#ffffff">
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Export</legend>
+                        <div class="setting">
+                            <label>Papierformat:</label>
+                            <select>
+                                <option value="a4" selected>A4</option>
+                                <option value="a3">A3</option>
+                                <option value="10x15">10x15 cm</option>
+                            </select>
+                        </div>
+                        <button type="button" id="generate-btn">PDF generieren</button>
+                    </fieldset>
+                </div>
+
+                <div id="preview-section">
+                    <h2>Vorschau</h2>
+                    <div id="preview-container">
+                        <div id="preview-loader">Beispiel-Vorschau</div>
+                    </div>
+                </div>
+
+                <div class="selection-controls">
+                    <button type="button">Alle auswählen</button>
+                    <button type="button">Alle abwählen</button>
+                    <button type="button">Nur ungedruckte</button>
+                </div>
+
+                <div id="lok-selection-container" class="grid-container">
+                    <!-- Sample Lok Cards -->
+                    <div class="lok-card">
+                        <input type="checkbox" checked>
+                        <div class="sample-image">BR 103</div>
+                        <div class="info">
+                            <p class="name">BR 103 235-8</p>
+                            <p class="address">Adresse: 103</p>
+                        </div>
+                    </div>
+                    <div class="lok-card printed">
+                        <input type="checkbox">
+                        <div class="sample-image">BR 218</div>
+                        <div class="info">
+                            <p class="name">BR 218 <span class="printed-badge">Gedruckt</span></p>
+                            <p class="address">Adresse: 218</p>
+                        </div>
+                    </div>
+                    <div class="lok-card">
+                        <input type="checkbox" checked>
+                        <div class="sample-image">BR 151</div>
+                        <div class="info">
+                            <p class="name">BR 151 070-0</p>
+                            <p class="address">Adresse: 151</p>
+                        </div>
+                    </div>
+                    <div class="lok-card">
+                        <input type="checkbox">
+                        <div class="sample-image">BR 112</div>
+                        <div class="info">
+                            <p class="name">BR 112 139-2</p>
+                            <p class="address">Adresse: 112</p>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script>
+    // Style Switcher Logic
+    const buttons = document.querySelectorAll('.style-btn');
+    const stylesheet = document.getElementById('theme-stylesheet');
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Update active state
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Switch stylesheet
+            const newStyle = btn.dataset.style;
+            stylesheet.href = newStyle;
+
+            // Regenerate trees after style change
+            setTimeout(generateRandomTrees, 100);
+        });
+    });
+
+    // Generate random trees for header
+    function generateRandomTrees() {
+        const treesContainer = document.getElementById('header-trees');
+        if (!treesContainer) return;
+
+        treesContainer.innerHTML = '';
+
+        const containerWidth = window.innerWidth;
+        const treeTypes = ['icons8-tree-96.png', 'icons8-laubbaum.png'];
+        const minTrees = Math.max(6, Math.floor(containerWidth / 50));
+        const numTrees = minTrees + Math.floor(Math.random() * 3);
+        const minSpacing = 25;
+        const positions = [];
+
+        for (let i = 0; i < numTrees; i++) {
+            let pos;
+            let attempts = 0;
+            do {
+                pos = 20 + Math.floor(Math.random() * (containerWidth - 40));
+                attempts++;
+            } while (positions.some(p => Math.abs(p - pos) < minSpacing) && attempts < 50);
+
+            if (attempts < 50) {
+                positions.push(pos);
+
+                const tree = document.createElement('img');
+                tree.src = treeTypes[Math.floor(Math.random() * treeTypes.length)];
+                tree.className = 'tree';
+                tree.alt = 'Baum';
+                tree.style.left = pos + 'px';
+                const scale = 0.7 + Math.random() * 0.5;
+                tree.style.height = (45 * scale) + 'px';
+                tree.style.zIndex = Math.floor(scale * 10);
+                treesContainer.appendChild(tree);
+            }
+        }
+    }
+
+    // Set header train speed
+    function setHeaderTrainSpeed() {
+        const headerTrack = document.querySelector('.header-track');
+        if (!headerTrack) return;
+
+        const width = window.innerWidth + 200;
+        const speed = 80;
+        const duration = width / speed;
+
+        headerTrack.style.setProperty('--header-train-duration', `${duration}s`);
+    }
+
+    // Initialize
+    generateRandomTrees();
+    setHeaderTrainSpeed();
+
+    window.addEventListener('resize', () => {
+        setHeaderTrainSpeed();
+    });
+</script>
+</body>
+</html>

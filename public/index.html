@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lok-Karten Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Browser-only dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<!-- Loading Screen -->
+<div id="loading-screen">
+    <div class="loading-content">
+        <div class="track">
+            <div class="trees" id="trees"></div>
+            <div class="track-line"></div>
+            <div class="train">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <div class="locomotive-container">
+                    <img src="icons8-lokomotive-emoji-100.png" class="locomotive" alt="Lokomotive">
+                    <div class="smoke-container">
+                        <div class="smoke-puff"></div>
+                        <div class="smoke-puff"></div>
+                        <div class="smoke-puff"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="loading-text" data-i18n="loadingComponents">Lade Komponenten...</p>
+        <a href="https://icons8.com" target="_blank" class="icons8-link">Icons by Icons8</a>
+    </div>
+</div>
+
+<div id="app" class="hidden">
+    <header>
+        <div class="lang-switcher">
+            <button class="lang-btn" data-lang="de" title="Deutsch">🇩🇪</button>
+            <button class="lang-btn" data-lang="en" title="English">🇬🇧</button>
+            <button class="lang-btn" data-lang="nl" title="Nederlands">🇳🇱</button>
+            <button class="lang-btn" data-lang="la" title="Latina">🏛️</button>
+        </div>
+        <h1 data-i18n="title">Lok-Karten Generator</h1>
+        <div class="header-track">
+            <div class="trees" id="header-trees"></div>
+            <div class="track-line"></div>
+            <div class="train">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <div class="locomotive-container">
+                    <img src="icons8-lokomotive-emoji-100.png" class="locomotive" alt="Lokomotive">
+                    <div class="smoke-container">
+                        <div class="smoke-puff"></div>
+                        <div class="smoke-puff"></div>
+                        <div class="smoke-puff"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button id="reset-upload-btn" class="hidden" data-i18n="resetUpload">Neue Datei hochladen</button>
+        <a href="https://icons8.com" target="_blank" class="icons8-link header-icons8">Icons by Icons8</a>
+    </header>
+
+    <main>
+        <div id="upload-section">
+            <h2 data-i18n="step1Title">1. Wähle dein Z21-Backup</h2>
+            <p data-i18n="step1Desc" data-i18n-html="true">Erstelle in der <strong>Z21-App</strong> ein Backup deiner Lokomotiven und öffne es hier.</p>
+
+            <div id="dropzone">
+                <div class="dropzone-content">
+                    <span class="dropzone-icon">📂</span>
+                    <p class="dropzone-text" data-i18n="dropzoneText">Backup-Datei hier ablegen</p>
+                    <p class="dropzone-subtext" data-i18n="dropzoneSubtext">oder klicken zum Auswählen</p>
+                    <input type="file" id="z21-upload" accept=".z21,.zip">
+                </div>
+            </div>
+
+            <div id="upload-status"></div>
+
+            <div class="privacy-note">
+                <span>🔒</span>
+                <span data-i18n="privacyNote">Deine Daten bleiben auf deinem Gerät – es wird nichts ins Internet übertragen.</span>
+            </div>
+        </div>
+
+        <div id="main-app-content" class="hidden">
+            <h2 data-i18n="step2Title">2. Anpassen und Exportieren</h2>
+            <form id="lok-form">
+                <div class="controls">
+                    <fieldset>
+                        <legend data-i18n="cardSize">Karten-Größe</legend>
+                        <div class="setting">
+                            <label for="card-width"><span data-i18n="cardWidth">Breite (cm):</span> <span id="card-width-val">4</span></label>
+                            <input type="range" class="config-input" id="card-width" name="cardWidth" min="2" max="10" value="4" step="0.5">
+                        </div>
+                        <div class="setting">
+                            <label for="card-height"><span data-i18n="cardHeight">Höhe (cm):</span> <span id="card-height-val">2</span></label>
+                            <input type="range" class="config-input" id="card-height" name="cardHeight" min="1" max="10" value="2" step="0.5">
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend data-i18n="addressStyle">Adressen-Stil</legend>
+                        <div class="setting">
+                            <label data-i18n="styleLabel">Stil:</label>
+                            <select name="addressStyle" id="address-style-select" class="config-input"
+                                    data-i18n-options='{"circle":"styleCircle","rotated-right":"styleRotatedRight","rotated-left":"styleRotatedLeft"}'>
+                                <option value="circle">Kreis</option>
+                                <option value="rotated-right" selected>Gedreht Rechts</option>
+                                <option value="rotated-left">Gedreht Links</option>
+                            </select>
+                        </div>
+                        <div id="rotated-settings">
+                            <div class="setting">
+                            <label for="rotated-padding"><span data-i18n="sidePadding">Seiten-Abstand (%):</span> <span id="rotated-padding-val">20</span></label>
+                                <input type="range" class="config-input" id="rotated-padding" name="rotatedPadding" min="0" max="45" value="20" step="1">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset id="circle-settings" class="hidden">
+                        <legend data-i18n="circleDetails">Kreis-Details</legend>
+                        <div class="setting">
+                            <label for="circle-size"><span data-i18n="circleSize">Größe (mm):</span> <span id="circle-size-val">4</span></label>
+                            <input type="range" class="config-input" id="circle-size" name="circleSize" min="4" max="20" value="4">
+                        </div>
+                        <div class="setting">
+                            <label data-i18n="position">Position:</label>
+                            <select name="circlePosition" class="config-input"
+                                    data-i18n-options='{"top-right":"posTopRight","top-left":"posTopLeft","bottom-right":"posBottomRight","bottom-left":"posBottomLeft"}'>
+                                <option value="top-right" selected>Oben Rechts</option>
+                                <option value="top-left">Oben Links</option>
+                                <option value="bottom-right">Unten Rechts</option>
+                                <option value="bottom-left">Unten Links</option>
+                            </select>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend data-i18n="colorsFont">Farben & Schrift</legend>
+                        <div class="setting">
+                            <label for="bg-color" data-i18n="bgColor">Hintergrund:</label>
+                            <input type="color" class="config-input" id="bg-color" name="backgroundColor" value="#d32f2f">
+                        </div>
+                        <div class="setting">
+                            <label for="text-color" data-i18n="textColor">Schrift:</label>
+                            <input type="color" class="config-input" id="text-color" name="textColor" value="#ffffff">
+                        </div>
+                        <div class="setting">
+                            <label for="font-size"><span data-i18n="fontSize">Schriftgröße (px):</span> <span id="font-size-val">80</span></label>
+                            <input type="range" class="config-input" id="font-size" name="fontSize" min="10" max="150" value="80">
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend data-i18n="export">Export</legend>
+                        <div class="setting">
+                            <label data-i18n="paperFormat">Papierformat:</label>
+                            <select name="format" class="config-input">
+                                <option value="a4" selected>A4</option>
+                                <option value="a3">A3</option>
+                                <option value="10x15">10x15 cm</option>
+                            </select>
+                        </div>
+                        <button type="submit" id="generate-btn" data-i18n="generatePdf">PDF generieren</button>
+                    </fieldset>
+                </div>
+
+                <div id="preview-section">
+                    <h2 data-i18n="preview">Vorschau</h2>
+                    <div id="preview-container">
+                        <canvas id="preview-canvas"></canvas>
+                        <div id="preview-loader" data-i18n="loadingPreview">Lade Vorschau...</div>
+                    </div>
+                </div>
+
+                <div class="selection-controls">
+                    <button type="button" id="select-all-btn" data-i18n="selectAll">Alle auswählen</button>
+                    <button type="button" id="deselect-all-btn" data-i18n="deselectAll">Alle abwählen</button>
+                    <button type="button" id="select-unprinted-btn" data-i18n="selectUnprinted">Nur ungedruckte</button>
+                </div>
+
+                <div id="lok-selection-container" class="grid-container">
+                    <p data-i18n="loadingLoks">Lade Loks...</p>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+{
+  "title": "Locomotive Card Generator",
+  "resetUpload": "Upload new file",
+
+  "loadingSqlite": "Loading SQLite Engine...",
+  "loadingReady": "Ready!",
+  "loadingError": "Error loading. Please reload page.",
+  "loadingComponents": "Loading components...",
+
+  "step1Title": "1. Select your Z21 Backup",
+  "step1Desc": "Create a backup of your locomotives in the <strong>Z21 App</strong> and open it here.",
+  "dropzoneText": "Drop backup file here",
+  "dropzoneSubtext": "or click to select",
+  "privacyNote": "Your data stays on your device – nothing is transmitted to the internet.",
+  "processingBackup": "Processing backup...",
+  "invalidFileType": "Please select a .z21 or .zip file.",
+  "errorPrefix": "Error:",
+
+  "step2Title": "2. Customize and Export",
+
+  "cardSize": "Card Size",
+  "cardWidth": "Width (cm):",
+  "cardHeight": "Height (cm):",
+
+  "addressStyle": "Address Style",
+  "styleLabel": "Style:",
+  "styleCircle": "Circle",
+  "styleRotatedRight": "Rotated Right",
+  "styleRotatedLeft": "Rotated Left",
+  "sidePadding": "Side Padding (%):",
+
+  "circleDetails": "Circle Details",
+  "circleSize": "Size (mm):",
+  "position": "Position:",
+  "posTopRight": "Top Right",
+  "posTopLeft": "Top Left",
+  "posBottomRight": "Bottom Right",
+  "posBottomLeft": "Bottom Left",
+
+  "colorsFont": "Colors & Font",
+  "bgColor": "Background:",
+  "textColor": "Text:",
+  "fontSize": "Font Size (px):",
+
+  "export": "Export",
+  "paperFormat": "Paper Format:",
+  "generatePdf": "Generate PDF",
+  "generating": "Generating...",
+
+  "preview": "Preview",
+  "loadingPreview": "Loading preview...",
+  "noLokPreview": "No locomotive for preview.",
+  "previewError": "Error generating preview.",
+
+  "selectAll": "Select all",
+  "deselectAll": "Deselect all",
+  "selectUnprinted": "Unprinted only",
+  "loadingLoks": "Loading locomotives...",
+
+  "address": "Address:",
+  "noImage": "No image",
+
+  "selectAtLeastOne": "Please select at least one locomotive.",
+  "pdfError": "Error creating PDF.",
+
+  "noValidFormat": "No valid Z21 export format found.",
+  "locoNotFound": "Loco.sqlite not found.",
+  "sqlLoadError": "Could not load sql.js"
+}

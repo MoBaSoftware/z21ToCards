@@ -1,0 +1,631 @@
+/* ==================== Industrial/Modern Design ==================== */
+
+:root {
+    --primary-color: #2d3436;
+    --secondary-color: #ec0016;
+    --accent-color: #636e72;
+    --light-gray: #f5f6f7;
+    --dark-gray: #636e72;
+    --text-color: #2d3436;
+    --card-bg: #ffffff;
+    --metal-gradient: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+}
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    background-color: var(--light-gray);
+    color: var(--text-color);
+    letter-spacing: 0.01em;
+}
+
+/* ==================== Header ==================== */
+header {
+    background: var(--primary-color);
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem;
+    position: relative;
+    border-bottom: 4px solid var(--secondary-color);
+}
+
+h1 {
+    margin: 0;
+    font-weight: 300;
+    font-size: 2rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+h2 {
+    margin-top: 0;
+    text-align: center;
+    color: var(--primary-color);
+    font-weight: 300;
+    font-size: 1.3rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* ==================== Buttons ==================== */
+#reset-upload-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.6rem 1.2rem;
+    background-color: transparent;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 0;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+}
+
+#reset-upload-btn:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+/* ==================== Upload Section ==================== */
+#upload-section {
+    background: var(--card-bg);
+    padding: 2.5rem;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    max-width: 500px;
+    margin: 0 auto;
+    border-left: 4px solid var(--secondary-color);
+}
+
+#upload-section h2 {
+    margin-bottom: 0.5rem;
+}
+
+#upload-section > p {
+    color: var(--dark-gray);
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+/* Dropzone - Clean industrial */
+#dropzone {
+    border: 2px dashed var(--accent-color);
+    padding: 2.5rem 2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--light-gray);
+}
+
+#dropzone:hover {
+    border-color: var(--secondary-color);
+    background: #fff;
+}
+
+#dropzone.drag-over {
+    border-color: var(--secondary-color);
+    background: #fff;
+    border-style: solid;
+}
+
+.dropzone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dropzone-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    filter: grayscale(100%);
+}
+
+.dropzone-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.dropzone-subtext {
+    font-size: 0.85rem;
+    color: var(--dark-gray);
+    margin: 0;
+}
+
+#dropzone input[type="file"] {
+    display: none;
+}
+
+#upload-status {
+    margin-top: 1.5rem;
+    font-weight: 500;
+    min-height: 1.2em;
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+}
+
+#upload-status.error {
+    color: var(--secondary-color);
+}
+
+/* Privacy note */
+.privacy-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 0.75rem 1rem;
+    background: #e8e8e8;
+    font-size: 0.8rem;
+    color: var(--dark-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* ==================== Controls ==================== */
+.controls {
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--primary-color);
+}
+
+fieldset {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin: 0;
+    min-width: 200px;
+    flex-grow: 1;
+    background: #fafafa;
+}
+
+legend {
+    font-weight: 500;
+    padding: 0 0.75rem;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+}
+
+.setting {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.setting:last-child {
+    margin-bottom: 0;
+}
+
+.setting label {
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--dark-gray);
+}
+
+.setting input[type="range"] {
+    width: 100%;
+    accent-color: var(--secondary-color);
+}
+
+.setting select,
+.setting input[type="color"],
+#generate-btn {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    background: #fff;
+}
+
+.setting input[type="color"] {
+    height: 40px;
+    padding: 0.2rem;
+    min-width: 50px;
+}
+
+#generate-btn {
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    align-self: flex-end;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.75rem 2rem;
+    font-size: 0.85rem;
+}
+
+#generate-btn:hover {
+    background: #d10014;
+}
+
+#generate-btn:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+}
+
+/* ==================== Preview Section ==================== */
+#preview-section {
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--accent-color);
+}
+
+#preview-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px;
+    background-color: var(--light-gray);
+    position: relative;
+    padding: 1rem;
+}
+
+#preview-canvas {
+    max-width: 100%;
+    max-height: 150px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+#preview-loader {
+    position: absolute;
+    font-weight: 500;
+    color: var(--dark-gray);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+}
+
+/* ==================== Selection Controls ==================== */
+.selection-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.selection-controls button {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--primary-color);
+    background-color: transparent;
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.selection-controls button:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* ==================== Lok Cards ==================== */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.lok-card {
+    background-color: var(--card-bg);
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.lok-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.lok-card input[type="checkbox"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.lok-card input[type="checkbox"]:checked ~ img {
+    outline: 3px solid var(--secondary-color);
+    outline-offset: -3px;
+}
+
+.lok-card img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    display: block;
+}
+
+.lok-card .info {
+    padding: 0.75rem;
+    flex-grow: 1;
+    border-top: 1px solid #eee;
+}
+
+.lok-card .info .name {
+    font-weight: 500;
+    color: var(--primary-color);
+    font-size: 0.95rem;
+    margin: 0 0 0.25rem 0;
+}
+
+.lok-card .info .address {
+    font-weight: normal;
+    color: var(--dark-gray);
+    font-size: 0.85rem;
+    margin: 0;
+    font-family: 'Courier New', monospace;
+}
+
+/* Printed lok styling */
+.lok-card.printed {
+    opacity: 0.6;
+}
+
+.lok-card.printed:hover {
+    opacity: 1;
+}
+
+.lok-card.printed img {
+    filter: grayscale(50%);
+}
+
+.lok-card.printed:hover img {
+    filter: none;
+}
+
+.printed-badge {
+    display: inline-block;
+    background-color: #27ae60;
+    color: white;
+    font-size: 0.65rem;
+    padding: 0.1rem 0.4rem;
+    margin-left: 0.3rem;
+    vertical-align: middle;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ==================== Loading Screen ==================== */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease-out;
+}
+
+#loading-screen.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+}
+
+.loading-text {
+    margin-top: 2rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 300;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.icons8-link {
+    display: block;
+    margin-top: 2rem;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.icons8-link:hover {
+    color: rgba(255,255,255,0.7);
+}
+
+.header-icons8 {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    margin: 0;
+}
+
+/* ==================== Track Animation ==================== */
+.track {
+    position: relative;
+    width: 300px;
+    height: 80px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.train {
+    position: absolute;
+    bottom: 1px;
+    display: flex;
+    align-items: flex-end;
+    animation: drive 3.5s linear infinite;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.4));
+    z-index: 10;
+}
+
+.locomotive {
+    height: 55px;
+    width: auto;
+}
+
+.wagon {
+    height: 48px;
+    width: auto;
+    margin-right: 2px;
+}
+
+.locomotive-container {
+    position: relative;
+    top: 3px;
+}
+
+.smoke-container {
+    position: absolute;
+    left: 41px;
+    top: 11px;
+    width: 10px;
+    height: 10px;
+}
+
+.smoke-puff {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, rgba(180,180,180,0.9) 0%, rgba(130,130,130,0.4) 50%, transparent 70%);
+    border-radius: 50%;
+    animation: smoke-rise 1.2s ease-out infinite;
+}
+
+.smoke-puff:nth-child(2) {
+    animation-delay: 0.4s;
+}
+
+.smoke-puff:nth-child(3) {
+    animation-delay: 0.8s;
+}
+
+@keyframes smoke-rise {
+    0% {
+        opacity: 0.8;
+        transform: translateY(0) scale(0.5);
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-25px) translateX(-15px) scale(2);
+    }
+}
+
+.trees {
+    position: absolute;
+    bottom: 9px;
+    left: 0;
+    right: 0;
+    z-index: 2;
+}
+
+.tree {
+    position: absolute;
+    height: 45px;
+    width: auto;
+    bottom: 0;
+}
+
+@keyframes drive {
+    0% { left: -180px; }
+    100% { left: 320px; }
+}
+
+.track-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 12px;
+    z-index: 1;
+    background: repeating-linear-gradient(
+        90deg,
+        #4a4a4a 0px,
+        #4a4a4a 8px,
+        transparent 8px,
+        transparent 12px
+    );
+}
+
+.track-line::before,
+.track-line::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to bottom, #c0c0c0 0%, #909090 50%, #707070 100%);
+    border-radius: 1px;
+}
+
+.track-line::before {
+    top: 1px;
+}
+
+.track-line::after {
+    bottom: 1px;
+}
+
+/* Header Track - Full Width */
+.header-track {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    height: 80px;
+    margin-top: 1.5rem;
+    overflow: hidden;
+}
+
+.header-track .train {
+    animation: drive-header var(--header-train-duration, 12s) linear infinite;
+}
+
+@keyframes drive-header {
+    0% { left: -180px; }
+    100% { left: calc(100% + 20px); }
+}
+
+.hidden { display: none !important; }

@@ -1,0 +1,69 @@
+{
+  "title": "Locomotief Kaarten Generator",
+  "resetUpload": "Nieuw bestand uploaden",
+
+  "loadingSqlite": "SQLite Engine laden...",
+  "loadingReady": "Gereed!",
+  "loadingError": "Fout bij laden. Vernieuw de pagina.",
+  "loadingComponents": "Componenten laden...",
+
+  "step1Title": "1. Selecteer je Z21-Backup",
+  "step1Desc": "Maak een backup van je locomotieven in de <strong>Z21-App</strong> en open deze hier.",
+  "dropzoneText": "Sleep backup-bestand hierheen",
+  "dropzoneSubtext": "of klik om te selecteren",
+  "privacyNote": "Je gegevens blijven op je apparaat – er wordt niets naar internet verzonden.",
+  "processingBackup": "Backup verwerken...",
+  "invalidFileType": "Selecteer een .z21 of .zip bestand.",
+  "errorPrefix": "Fout:",
+
+  "step2Title": "2. Aanpassen en Exporteren",
+
+  "cardSize": "Kaartgrootte",
+  "cardWidth": "Breedte (cm):",
+  "cardHeight": "Hoogte (cm):",
+
+  "addressStyle": "Adresstijl",
+  "styleLabel": "Stijl:",
+  "styleCircle": "Cirkel",
+  "styleRotatedRight": "Gedraaid Rechts",
+  "styleRotatedLeft": "Gedraaid Links",
+  "sidePadding": "Zijmarge (%):",
+
+  "circleDetails": "Cirkel Details",
+  "circleSize": "Grootte (mm):",
+  "position": "Positie:",
+  "posTopRight": "Rechtsboven",
+  "posTopLeft": "Linksboven",
+  "posBottomRight": "Rechtsonder",
+  "posBottomLeft": "Linksonder",
+
+  "colorsFont": "Kleuren & Lettertype",
+  "bgColor": "Achtergrond:",
+  "textColor": "Tekst:",
+  "fontSize": "Lettergrootte (px):",
+
+  "export": "Exporteren",
+  "paperFormat": "Papierformaat:",
+  "generatePdf": "PDF genereren",
+  "generating": "Genereren...",
+
+  "preview": "Voorbeeld",
+  "loadingPreview": "Voorbeeld laden...",
+  "noLokPreview": "Geen locomotief voor voorbeeld.",
+  "previewError": "Fout bij voorbeeld.",
+
+  "selectAll": "Alles selecteren",
+  "deselectAll": "Alles deselecteren",
+  "selectUnprinted": "Alleen niet-geprinte",
+  "loadingLoks": "Locomotieven laden...",
+
+  "address": "Adres:",
+  "noImage": "Geen afbeelding",
+
+  "selectAtLeastOne": "Selecteer minimaal één locomotief.",
+  "pdfError": "Fout bij maken van PDF.",
+
+  "noValidFormat": "Geen geldig Z21-exportformaat gevonden.",
+  "locoNotFound": "Loco.sqlite niet gevonden.",
+  "sqlLoadError": "Kon sql.js niet laden"
+}

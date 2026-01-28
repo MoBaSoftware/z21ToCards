@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ladeanimation Config</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .config-panel {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            font-family: sans-serif;
+            font-size: 14px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .config-panel h3 {
+            margin: 0 0 15px 0;
+        }
+        .config-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        .config-row label {
+            width: 120px;
+        }
+        .config-row input[type="range"] {
+            width: 150px;
+        }
+        .config-row .value {
+            width: 50px;
+            text-align: right;
+            font-family: monospace;
+        }
+        .config-panel button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        #loading-screen {
+            position: relative !important;
+        }
+        /* Pause animation for easier positioning */
+        .paused .train {
+            animation-play-state: paused !important;
+            left: 100px !important;
+        }
+        .paused .smoke-puff {
+            animation-play-state: paused !important;
+        }
+    </style>
+</head>
+<body>
+<div class="config-panel">
+    <h3>Rauch-Position</h3>
+    <div class="config-row">
+        <label>Smoke Left:</label>
+        <input type="range" id="smoke-left" min="-20" max="60" value="23">
+        <span class="value" id="smoke-left-val">23px</span>
+    </div>
+    <div class="config-row">
+        <label>Smoke Top:</label>
+        <input type="range" id="smoke-top" min="-20" max="40" value="2">
+        <span class="value" id="smoke-top-val">2px</span>
+    </div>
+    <h3>Zug-Position</h3>
+    <div class="config-row">
+        <label>Train Bottom:</label>
+        <input type="range" id="train-bottom" min="-10" max="30" value="3">
+        <span class="value" id="train-bottom-val">3px</span>
+    </div>
+    <div class="config-row">
+        <label>Lok Offset Y:</label>
+        <input type="range" id="lok-offset" min="-15" max="15" value="0">
+        <span class="value" id="lok-offset-val">0px</span>
+    </div>
+    <h3>Bäume-Position</h3>
+    <div class="config-row">
+        <label>Trees Bottom:</label>
+        <input type="range" id="trees-bottom" min="0" max="50" value="12">
+        <span class="value" id="trees-bottom-val">12px</span>
+    </div>
+    <div class="config-row">
+        <label for="pause-anim">Animation pausieren:</label>
+        <input type="checkbox" id="pause-anim">
+    </div>
+    <button onclick="copyCSS()">CSS kopieren</button>
+</div>
+
+<div id="loading-screen">
+    <div class="loading-content">
+        <div class="track">
+            <div class="trees" id="trees"></div>
+            <div class="track-line"></div>
+            <div class="train">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <div class="locomotive-container">
+                    <img src="icons8-lokomotive-emoji-100.png" class="locomotive" alt="Lokomotive">
+                    <div class="smoke-container">
+                        <div class="smoke-puff"></div>
+                        <div class="smoke-puff"></div>
+                        <div class="smoke-puff"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="loading-text">Config Mode</p>
+    </div>
+</div>
+
+<script>
+    const smokeContainer = document.querySelector('.smoke-container');
+    const train = document.querySelector('.train');
+    const loadingScreen = document.getElementById('loading-screen');
+
+    document.getElementById('smoke-left').addEventListener('input', (e) => {
+        smokeContainer.style.left = e.target.value + 'px';
+        document.getElementById('smoke-left-val').textContent = e.target.value + 'px';
+    });
+
+    document.getElementById('smoke-top').addEventListener('input', (e) => {
+        smokeContainer.style.top = e.target.value + 'px';
+        document.getElementById('smoke-top-val').textContent = e.target.value + 'px';
+    });
+
+    document.getElementById('train-bottom').addEventListener('input', (e) => {
+        train.style.bottom = e.target.value + 'px';
+        document.getElementById('train-bottom-val').textContent = e.target.value + 'px';
+    });
+
+    const lokContainer = document.querySelector('.locomotive-container');
+    document.getElementById('lok-offset').addEventListener('input', (e) => {
+        lokContainer.style.position = 'relative';
+        lokContainer.style.top = e.target.value + 'px';
+        document.getElementById('lok-offset-val').textContent = e.target.value + 'px';
+    });
+
+    const treesContainer = document.getElementById('trees');
+    document.getElementById('trees-bottom').addEventListener('input', (e) => {
+        treesContainer.style.bottom = e.target.value + 'px';
+        document.getElementById('trees-bottom-val').textContent = e.target.value + 'px';
+    });
+
+    document.getElementById('pause-anim').addEventListener('change', (e) => {
+        if (e.target.checked) {
+            loadingScreen.classList.add('paused');
+        } else {
+            loadingScreen.classList.remove('paused');
+        }
+    });
+
+    // Zufällige Bäume generieren
+    function generateRandomTrees() {
+        const treesContainer = document.getElementById('trees');
+        const treeTypes = ['icons8-tree-96.png', 'icons8-laubbaum.png'];
+        const numTrees = 6 + Math.floor(Math.random() * 3); // 6-8 Bäume
+        const positions = [];
+
+        for (let i = 0; i < numTrees; i++) {
+            let pos;
+            // Mindestabstand von 35px zwischen Bäumen
+            do {
+                pos = 20 + Math.floor(Math.random() * 240);
+            } while (positions.some(p => Math.abs(p - pos) < 25));
+            positions.push(pos);
+
+            const tree = document.createElement('img');
+            tree.src = treeTypes[Math.floor(Math.random() * treeTypes.length)];
+            tree.className = 'tree';
+            tree.alt = 'Baum';
+            tree.style.left = pos + 'px';
+            // Zufällige Größe für Tiefenwirkung
+            const scale = 0.7 + Math.random() * 0.5;
+            tree.style.height = (45 * scale) + 'px';
+            tree.style.zIndex = Math.floor(scale * 10);
+            treesContainer.appendChild(tree);
+        }
+    }
+
+    generateRandomTrees();
+
+    function copyCSS() {
+        const smokeLeft = document.getElementById('smoke-left').value;
+        const smokeTop = document.getElementById('smoke-top').value;
+        const trainBottom = document.getElementById('train-bottom').value;
+        const lokOffset = document.getElementById('lok-offset').value;
+        const treesBottom = document.getElementById('trees-bottom').value;
+
+        const css = `.smoke-container { left: ${smokeLeft}px; top: ${smokeTop}px; }
+.train { bottom: ${trainBottom}px; }
+.locomotive-container { position: relative; top: ${lokOffset}px; }
+.trees { bottom: ${treesBottom}px; }`;
+
+        navigator.clipboard.writeText(css);
+        alert('CSS kopiert!');
+    }
+</script>
+</body>
+</html>

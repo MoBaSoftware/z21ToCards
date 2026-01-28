@@ -1,0 +1,21 @@
+{
+  "hlTop": 24,
+  "hlRight": 1,
+  "hl2Top": 36,
+  "hl2Right": 1,
+  "coneSpread": 40,
+  "coneOpacity": 35,
+  "wlTop": 14,
+  "wlLeft": 0,
+  "winTop": 12,
+  "winWidth": 30,
+  "winHeight": 12,
+  "winLeft": 8,
+  "wagSpacing": 2,
+  "winMaskX": -1,
+  "winMaskY": -2,
+  "winMaskScale": 95,
+  "fireMaskX": 0,
+  "fireMaskY": -2,
+  "fireMaskScale": 100
+}

@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zug-Beleuchtung Config</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            margin: 0;
+            background: #2a2a2a;
+        }
+
+        header {
+            padding-top: 3rem;
+            transition: transform 0.3s ease;
+            transform-origin: 50% 85%;
+        }
+
+        .config-panel {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 10000;
+            font-family: sans-serif;
+            font-size: 14px;
+            max-height: 85vh;
+            overflow-y: auto;
+            color: #333;
+            min-width: 400px;
+        }
+        .config-panel h3 {
+            margin: 15px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #ddd;
+            color: #555;
+        }
+        .config-panel h3:first-child { margin-top: 0; }
+        .config-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            gap: 10px;
+        }
+        .config-row label {
+            width: 140px;
+            font-size: 13px;
+        }
+        .config-row input[type="range"] { width: 140px; }
+        .config-row .value {
+            width: 50px;
+            text-align: right;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .config-panel button {
+            padding: 8px 16px;
+            cursor: pointer;
+            background: #5c4033;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        .config-panel button:hover { background: #7a5a4a; }
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .toggle-row {
+            display: flex;
+            gap: 4px;
+            background: #eee;
+            border-radius: 4px;
+            padding: 2px;
+        }
+        .toggle-btn {
+            padding: 4px 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 13px;
+            color: #666;
+        }
+        .toggle-btn.active {
+            background: #5c4033;
+            color: white;
+        }
+
+        /* Pause & zoom */
+        .paused .train {
+            animation-play-state: paused !important;
+            left: calc(50% - 120px) !important;
+        }
+        .paused .smoke-puff { animation-play-state: paused !important; }
+        .paused .sun, .paused .moon, .paused .cloud {
+            animation-play-state: paused !important;
+        }
+
+        .zoomed {
+            transform: scale(3);
+        }
+
+        /* Force night */
+        .force-night .sky {
+            animation: none !important;
+            --sky-top: #0a0a1a;
+            --sky-mid: #1a1a2e;
+            --sky-bottom: #1a1a2e;
+        }
+        .force-night .night-overlay {
+            animation: none !important;
+            opacity: 0.7 !important;
+        }
+        .force-night .headlight, .force-night .wagon-light,
+        .force-night .window-pane {
+            animation: none !important;
+            opacity: 0.9 !important;
+        }
+        .force-night .fire-pane {
+            animation: fire-flicker 0.8s ease-in-out infinite alternate !important;
+            opacity: 0.9 !important;
+        }
+        .force-night .sun { animation: none !important; opacity: 0 !important; }
+        .force-night .moon {
+            animation: none !important;
+            opacity: 0.9 !important;
+            left: 50% !important;
+            top: 15% !important;
+        }
+
+        /* Force day */
+        .force-day .sky {
+            animation: none !important;
+            --sky-top: #2e6bba;
+            --sky-mid: #5da1e0;
+            --sky-bottom: #87ceeb;
+        }
+        .force-day .night-overlay {
+            animation: none !important;
+            opacity: 0 !important;
+        }
+        .force-day .headlight, .force-day .wagon-light,
+        .force-day .window-pane, .force-day .fire-pane {
+            animation: none !important;
+            opacity: 0 !important;
+        }
+
+        /* Paused + Night: all lights white for mask debugging */
+        .paused.force-night .window-pane,
+        .paused.force-night .fire-pane {
+            fill: rgba(255, 255, 255, 0.95) !important;
+            animation: none !important;
+            opacity: 1 !important;
+        }
+        .paused.force-night .headlight,
+        .paused.force-night .wagon-light {
+            opacity: 1 !important;
+            animation: none !important;
+            background: white !important;
+            box-shadow: 0 0 8px 4px rgba(255, 255, 255, 0.8) !important;
+        }
+        .paused.force-night .headlight::after {
+            display: none !important;
+        }
+        .force-day .sun {
+            animation: none !important;
+            opacity: 1 !important;
+            left: 48% !important;
+            top: 8% !important;
+        }
+        .force-day .moon { animation: none !important; opacity: 0 !important; }
+    </style>
+</head>
+<body>
+<div class="config-panel">
+    <h3>Scheinwerfer (Lok)</h3>
+    <div class="config-row">
+        <label>Oben (px):</label>
+        <input type="range" id="hl-top" min="0" max="50" value="18">
+        <span class="value" id="hl-top-val">18px</span>
+    </div>
+    <div class="config-row">
+        <label>Rechts (px):</label>
+        <input type="range" id="hl-right" min="-15" max="15" value="-2">
+        <span class="value" id="hl-right-val">-2px</span>
+    </div>
+    <div class="config-row">
+        <label>2. Licht Oben (px):</label>
+        <input type="range" id="hl2-top" min="0" max="50" value="28">
+        <span class="value" id="hl2-top-val">28px</span>
+    </div>
+    <div class="config-row">
+        <label>2. Licht Rechts (px):</label>
+        <input type="range" id="hl2-right" min="-15" max="15" value="3">
+        <span class="value" id="hl2-right-val">3px</span>
+    </div>
+
+    <h3>Lichtkegel</h3>
+    <div class="config-row">
+        <label>Kegel-Breite (px):</label>
+        <input type="range" id="cone-spread" min="10" max="80" value="25">
+        <span class="value" id="cone-spread-val">25px</span>
+    </div>
+    <div class="config-row">
+        <label>Kegel-Stärke:</label>
+        <input type="range" id="cone-opacity" min="10" max="100" value="30" step="5">
+        <span class="value" id="cone-opacity-val">30%</span>
+    </div>
+
+    <h3>Waggon-Lichter</h3>
+    <div class="config-row">
+        <label>Oben (px):</label>
+        <input type="range" id="wl-top" min="0" max="45" value="10">
+        <span class="value" id="wl-top-val">10px</span>
+    </div>
+    <div class="config-row">
+        <label>Links (px):</label>
+        <input type="range" id="wl-left" min="0" max="45" value="20">
+        <span class="value" id="wl-left-val">20px</span>
+    </div>
+
+    <h3>Waggon-Fenster</h3>
+    <div class="config-row">
+        <label>Oben (px):</label>
+        <input type="range" id="win-top" min="0" max="40" value="10">
+        <span class="value" id="win-top-val">10px</span>
+    </div>
+    <div class="config-row">
+        <label>Breite (px):</label>
+        <input type="range" id="win-width" min="5" max="50" value="30">
+        <span class="value" id="win-width-val">30px</span>
+    </div>
+    <div class="config-row">
+        <label>Höhe (px):</label>
+        <input type="range" id="win-height" min="3" max="30" value="12">
+        <span class="value" id="win-height-val">12px</span>
+    </div>
+    <div class="config-row">
+        <label>Links-Offset (px):</label>
+        <input type="range" id="win-left" min="0" max="30" value="8">
+        <span class="value" id="win-left-val">8px</span>
+    </div>
+
+    <h3>Waggon-Abstände</h3>
+    <div class="config-row">
+        <label>Abstand (px):</label>
+        <input type="range" id="wag-spacing" min="0" max="20" value="2">
+        <span class="value" id="wag-spacing-val">2px</span>
+    </div>
+
+    <h3>Fenster-Maske (Waggon)</h3>
+    <div class="config-row">
+        <label>X-Verschiebung (px):</label>
+        <input type="range" id="win-mask-x" min="-20" max="20" value="0">
+        <span class="value" id="win-mask-x-val">0px</span>
+    </div>
+    <div class="config-row">
+        <label>Y-Verschiebung (px):</label>
+        <input type="range" id="win-mask-y" min="-20" max="20" value="0">
+        <span class="value" id="win-mask-y-val">0px</span>
+    </div>
+    <div class="config-row">
+        <label>Skalierung (%):</label>
+        <input type="range" id="win-mask-scale" min="50" max="200" value="100" step="5">
+        <span class="value" id="win-mask-scale-val">100%</span>
+    </div>
+
+    <h3>Feuer-Maske (Lok)</h3>
+    <div class="config-row">
+        <label>X-Verschiebung (px):</label>
+        <input type="range" id="fire-mask-x" min="-20" max="20" value="0">
+        <span class="value" id="fire-mask-x-val">0px</span>
+    </div>
+    <div class="config-row">
+        <label>Y-Verschiebung (px):</label>
+        <input type="range" id="fire-mask-y" min="-20" max="20" value="0">
+        <span class="value" id="fire-mask-y-val">0px</span>
+    </div>
+    <div class="config-row">
+        <label>Skalierung (%):</label>
+        <input type="range" id="fire-mask-scale" min="50" max="200" value="100" step="5">
+        <span class="value" id="fire-mask-scale-val">100%</span>
+    </div>
+
+    <h3>Ansicht</h3>
+    <div class="config-row">
+        <label>Tageszeit:</label>
+        <div class="toggle-row">
+            <button class="toggle-btn" data-mode="auto">Auto</button>
+            <button class="toggle-btn" data-mode="day">Tag</button>
+            <button class="toggle-btn active" data-mode="night">Nacht</button>
+        </div>
+    </div>
+    <div class="config-row">
+        <label>Animation pausieren:</label>
+        <input type="checkbox" id="pause-anim">
+    </div>
+    <div class="config-row">
+        <label>Zoom (3x):</label>
+        <input type="checkbox" id="zoom">
+    </div>
+
+    <div class="btn-row">
+        <button onclick="downloadJSON()">JSON herunterladen</button>
+        <button onclick="copyCSS()">CSS kopieren</button>
+        <button onclick="resetConfig()">Zurücksetzen</button>
+    </div>
+    <div class="btn-row" style="margin-top:8px">
+        <label style="width:auto;cursor:pointer;background:#eee;padding:6px 12px;border-radius:4px;font-size:13px">
+            JSON laden <input type="file" id="load-json" accept=".json" style="display:none">
+        </label>
+    </div>
+</div>
+
+<header>
+    <h1>Beleuchtung konfigurieren</h1>
+    <div class="sky">
+        <div class="sun"></div>
+        <div class="moon"></div>
+    </div>
+    <div class="clouds" id="header-clouds"></div>
+    <div class="birds" id="header-birds"></div>
+    <div class="night-overlay"></div>
+    <div class="mountains" id="header-mountains"></div>
+    <div class="header-track">
+        <div class="trees" id="header-trees"></div>
+        <div class="track-line"></div>
+        <div class="train">
+            <div class="wagon-wrapper">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <svg class="wagon-windows-svg" viewBox="0 0 417 417" xmlns="http://www.w3.org/2000/svg">
+                    <defs><filter id="cwg1"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                    <g transform="matrix(4.16667,0,0,4.16667,0,0)" filter="url(#cwg1)">
+                        <g class="window-group">
+                            <path class="window-pane" d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877Z"/>
+                            <path class="window-pane" d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926Z"/>
+                        </g>
+                        <g class="window-group" transform="translate(35.5406,0.261878)">
+                            <path class="window-pane" d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877Z"/>
+                            <path class="window-pane" d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926Z"/>
+                        </g>
+                    </g>
+                </svg>
+                <div class="wagon-light tail-light"></div>
+            </div>
+            <div class="wagon-wrapper">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <svg class="wagon-windows-svg" viewBox="0 0 417 417" xmlns="http://www.w3.org/2000/svg">
+                    <defs><filter id="cwg2"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                    <g transform="matrix(4.16667,0,0,4.16667,0,0)" filter="url(#cwg2)">
+                        <g class="window-group">
+                            <path class="window-pane" d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877Z"/>
+                            <path class="window-pane" d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926Z"/>
+                        </g>
+                        <g class="window-group" transform="translate(35.5406,0.261878)">
+                            <path class="window-pane" d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877Z"/>
+                            <path class="window-pane" d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926Z"/>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+            <div class="wagon-wrapper">
+                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <svg class="wagon-windows-svg" viewBox="0 0 417 417" xmlns="http://www.w3.org/2000/svg">
+                    <defs><filter id="cwg3"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                    <g transform="matrix(4.16667,0,0,4.16667,0,0)" filter="url(#cwg3)">
+                        <g class="window-group">
+                            <path class="window-pane" d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877Z"/>
+                            <path class="window-pane" d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926Z"/>
+                        </g>
+                        <g class="window-group" transform="translate(35.5406,0.261878)">
+                            <path class="window-pane" d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877Z"/>
+                            <path class="window-pane" d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926Z"/>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+            <div class="locomotive-container">
+                <img src="icons8-lokomotive-emoji-100.png" class="locomotive" alt="Lokomotive">
+                <svg class="loco-fire-svg" viewBox="0 0 417 417" xmlns="http://www.w3.org/2000/svg">
+                    <defs><filter id="cfg-fire-glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                    <g transform="matrix(4.16667,0,0,4.16667,0,0)" filter="url(#cfg-fire-glow)">
+                        <path class="fire-pane" d="M14.007,43.225L13.946,50.564L31.699,51.303L32.634,50.174L32.577,44.576L31.244,42.809C31.244,42.809 9.99,42.059 14.007,43.225"/>
+                    </g>
+                </svg>
+                <div class="headlight"></div>
+                <div class="headlight headlight-2"></div>
+                <div class="smoke-container">
+                    <div class="smoke-puff"></div>
+                    <div class="smoke-puff"></div>
+                    <div class="smoke-puff"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bushes" id="header-bushes"></div>
+    </div>
+    <div class="grass"></div>
+</header>
+
+<script>
+    const DEFAULTS = {
+        hlTop: 18, hlRight: -2,
+        hl2Top: 28, hl2Right: 3,
+        coneSpread: 25, coneOpacity: 30,
+        wlTop: 10, wlLeft: 20,
+        winTop: 10, winWidth: 30, winHeight: 12, winLeft: 8,
+        wagSpacing: 2,
+        winMaskX: 0, winMaskY: 0, winMaskScale: 100,
+        fireMaskX: 0, fireMaskY: 0, fireMaskScale: 100
+    };
+
+    const ID_MAP = {
+        'hl-top': 'hlTop', 'hl-right': 'hlRight',
+        'hl2-top': 'hl2Top', 'hl2-right': 'hl2Right',
+        'cone-spread': 'coneSpread', 'cone-opacity': 'coneOpacity',
+        'wl-top': 'wlTop', 'wl-left': 'wlLeft',
+        'win-top': 'winTop', 'win-width': 'winWidth',
+        'win-height': 'winHeight', 'win-left': 'winLeft',
+        'wag-spacing': 'wagSpacing',
+        'win-mask-x': 'winMaskX', 'win-mask-y': 'winMaskY', 'win-mask-scale': 'winMaskScale',
+        'fire-mask-x': 'fireMaskX', 'fire-mask-y': 'fireMaskY', 'fire-mask-scale': 'fireMaskScale'
+    };
+    const SLIDER_IDS = Object.keys(ID_MAP);
+
+    function applyConfig(cfg) {
+        const root = document.documentElement.style;
+        root.setProperty('--headlight-top', cfg.hlTop + 'px');
+        root.setProperty('--headlight-right', cfg.hlRight + 'px');
+        root.setProperty('--headlight2-top', cfg.hl2Top + 'px');
+        root.setProperty('--headlight2-right', cfg.hl2Right + 'px');
+        root.setProperty('--cone-spread', cfg.coneSpread + 'px');
+        root.setProperty('--cone-opacity', (cfg.coneOpacity / 100));
+        root.setProperty('--wagon-light-top', cfg.wlTop + 'px');
+        root.setProperty('--wagon-light-left', cfg.wlLeft + 'px');
+        root.setProperty('--window-top', cfg.winTop + 'px');
+        root.setProperty('--window-width', cfg.winWidth + 'px');
+        root.setProperty('--window-height', cfg.winHeight + 'px');
+        root.setProperty('--window-left', cfg.winLeft + 'px');
+        root.setProperty('--wagon-spacing', cfg.wagSpacing + 'px');
+        root.setProperty('--window-mask-x', cfg.winMaskX + 'px');
+        root.setProperty('--window-mask-y', cfg.winMaskY + 'px');
+        root.setProperty('--window-mask-scale', cfg.winMaskScale / 100);
+        root.setProperty('--fire-mask-x', cfg.fireMaskX + 'px');
+        root.setProperty('--fire-mask-y', cfg.fireMaskY + 'px');
+        root.setProperty('--fire-mask-scale', cfg.fireMaskScale / 100);
+    }
+
+    function loadConfig() {
+        try {
+            const stored = localStorage.getItem('z21cards-train-config');
+            if (stored) return { ...DEFAULTS, ...JSON.parse(stored) };
+        } catch (e) {}
+        return { ...DEFAULTS };
+    }
+
+    function getCurrentConfig() {
+        const cfg = {};
+        SLIDER_IDS.forEach(id => {
+            cfg[ID_MAP[id]] = parseInt(document.getElementById(id).value);
+        });
+        return cfg;
+    }
+
+    function downloadJSON() {
+        const cfg = getCurrentConfig();
+        const blob = new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'train-config.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        // Also save to localStorage as backup
+        localStorage.setItem('z21cards-train-config', JSON.stringify(cfg));
+    }
+
+    function resetConfig() {
+        SLIDER_IDS.forEach(id => {
+            const key = ID_MAP[id];
+            document.getElementById(id).value = DEFAULTS[key];
+            document.getElementById(id + '-val').textContent = DEFAULTS[key] + getSuffix(id);
+        });
+        applyConfig(DEFAULTS);
+        localStorage.removeItem('z21cards-train-config');
+    }
+
+    function copyCSS() {
+        const cfg = getCurrentConfig();
+        const css = `:root {
+    --headlight-top: ${cfg.hlTop}px;
+    --headlight-right: ${cfg.hlRight}px;
+    --headlight2-top: ${cfg.hl2Top}px;
+    --headlight2-right: ${cfg.hl2Right}px;
+    --cone-spread: ${cfg.coneSpread}px;
+    --cone-opacity: ${cfg.coneOpacity / 100};
+    --wagon-light-top: ${cfg.wlTop}px;
+    --wagon-light-left: ${cfg.wlLeft}px;
+    --window-top: ${cfg.winTop}px;
+    --window-width: ${cfg.winWidth}px;
+    --window-height: ${cfg.winHeight}px;
+    --window-left: ${cfg.winLeft}px;
+    --wagon-spacing: ${cfg.wagSpacing}px;
+    --window-mask-x: ${cfg.winMaskX}px;
+    --window-mask-y: ${cfg.winMaskY}px;
+    --window-mask-scale: ${cfg.winMaskScale / 100};
+    --fire-mask-x: ${cfg.fireMaskX}px;
+    --fire-mask-y: ${cfg.fireMaskY}px;
+    --fire-mask-scale: ${cfg.fireMaskScale / 100};
+}`;
+        navigator.clipboard.writeText(css);
+        alert('CSS kopiert!');
+    }
+
+    function getSuffix(id) {
+        if (id === 'cone-opacity' || id.endsWith('-scale')) return '%';
+        return 'px';
+    }
+
+    // Wire up sliders
+    SLIDER_IDS.forEach(id => {
+        const input = document.getElementById(id);
+        input.addEventListener('input', () => {
+            document.getElementById(id + '-val').textContent = input.value + getSuffix(id);
+            applyConfig(getCurrentConfig());
+        });
+    });
+
+    // Day/Night toggle
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const hdr = document.querySelector('header');
+            hdr.classList.remove('force-night', 'force-day');
+            if (btn.dataset.mode === 'night') hdr.classList.add('force-night');
+            if (btn.dataset.mode === 'day') hdr.classList.add('force-day');
+        });
+    });
+
+    // Pause checkbox
+    document.getElementById('pause-anim').addEventListener('change', (e) => {
+        document.querySelector('header').classList.toggle('paused', e.target.checked);
+    });
+
+    // Zoom checkbox
+    document.getElementById('zoom').addEventListener('change', (e) => {
+        document.querySelector('header').classList.toggle('zoomed', e.target.checked);
+    });
+
+    // Load JSON file
+    document.getElementById('load-json').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const cfg = { ...DEFAULTS, ...JSON.parse(ev.target.result) };
+                SLIDER_IDS.forEach(id => {
+                    const key = ID_MAP[id];
+                    document.getElementById(id).value = cfg[key];
+                    document.getElementById(id + '-val').textContent = cfg[key] + getSuffix(id);
+                });
+                applyConfig(cfg);
+                localStorage.setItem('z21cards-train-config', JSON.stringify(cfg));
+            } catch (err) {
+                alert('Fehler beim Laden: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    });
+
+    // Generate trees & clouds
+    function generateRandomTrees(containerId) {
+        const c = document.getElementById(containerId);
+        if (!c) return;
+        const w = window.innerWidth;
+        const types = ['icons8-tree-96.png', 'icons8-laubbaum.png'];
+        const n = Math.max(6, Math.floor(w / 50)) + Math.floor(Math.random() * 3);
+        const pos = [];
+        for (let i = 0; i < n; i++) {
+            let p, a = 0;
+            do { p = 20 + Math.floor(Math.random() * (w - 40)); a++; }
+            while (pos.some(x => Math.abs(x - p) < 25) && a < 50);
+            if (a < 50) {
+                pos.push(p);
+                const t = document.createElement('img');
+                t.src = types[Math.floor(Math.random() * types.length)];
+                t.className = 'tree'; t.alt = 'Baum'; t.style.left = p + 'px';
+                const s = 0.7 + Math.random() * 0.5;
+                t.style.height = (45 * s) + 'px'; t.style.zIndex = Math.floor(s * 10);
+                c.appendChild(t);
+            }
+        }
+    }
+
+    function generateRandomClouds(containerId) {
+        const c = document.getElementById(containerId);
+        if (!c) return;
+        const w = window.innerWidth;
+        const colors = ['rgba(255,255,255,0.8)','rgba(245,245,245,0.75)','rgba(220,220,220,0.7)',
+            'rgba(200,200,200,0.65)','rgba(180,180,180,0.6)','rgba(230,235,240,0.7)'];
+        const n = Math.max(3, Math.floor(Math.max(6, Math.floor(w / 50)) / 3));
+        for (let i = 0; i < n; i++) {
+            const cl = document.createElement('div'); cl.className = 'cloud';
+            const cw = 40 + Math.random() * 80, ch = cw * (0.4 + Math.random() * 0.2);
+            const sx = w + 50 + Math.random() * 100, sy = Math.random() * 60;
+            const dur = 35 + Math.random() * 20;
+            const col = colors[Math.floor(Math.random() * colors.length)];
+            const g = [];
+            for (let j = 0; j < 3 + Math.floor(Math.random() * 3); j++) {
+                const cx = 20+Math.random()*60, cy = 30+Math.random()*40, sz = 30+Math.random()*40;
+                g.push(`radial-gradient(ellipse ${sz}% ${sz*.8}% at ${cx}% ${cy}%, ${col} 0%, transparent 70%)`);
+            }
+            cl.style.cssText = `width:${cw}px;height:${ch}px;left:${sx}px;top:${sy}px;background:${g.join(',')};animation-duration:${dur}s;animation-delay:${-Math.random()*dur}s;`;
+            c.appendChild(cl);
+        }
+    }
+
+    function generateMountains(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const w = window.innerWidth;
+        const layers = [
+            { color: '#7a8ea8', maxH: 85, peaks: 5 + Math.floor(Math.random() * 2), zIndex: 1 },
+            { color: '#5a7055', maxH: 60, peaks: 7 + Math.floor(Math.random() * 2), zIndex: 2 },
+            { color: '#3d5535', maxH: 40, peaks: 9 + Math.floor(Math.random() * 2), zIndex: 3 },
+        ];
+        layers.forEach(layer => {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'mountain-layer');
+            svg.setAttribute('viewBox', `0 0 ${w} ${layer.maxH}`);
+            svg.setAttribute('preserveAspectRatio', 'none');
+            svg.style.height = layer.maxH + 'px';
+            svg.style.zIndex = layer.zIndex;
+            let d = `M0,${layer.maxH}`;
+            const segW = w / layer.peaks;
+            for (let i = 0; i < layer.peaks; i++) {
+                const x1 = i * segW;
+                const x2 = x1 + segW / 2;
+                const x3 = x1 + segW;
+                const valleyH = layer.maxH * (0.6 + Math.random() * 0.3);
+                const peakH = layer.maxH * (0.1 + Math.random() * 0.35);
+                const cp1x = x1 + segW * 0.25;
+                const cp2x = x1 + segW * 0.35;
+                const cp3x = x2 + segW * 0.15;
+                const cp4x = x2 + segW * 0.25;
+                d += ` C${cp1x},${valleyH} ${cp2x},${peakH} ${x2},${peakH}`;
+                d += ` C${cp3x},${peakH} ${cp4x},${valleyH} ${x3},${valleyH}`;
+            }
+            d += ` L${w},${layer.maxH} Z`;
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', d);
+            path.setAttribute('fill', layer.color);
+            svg.appendChild(path);
+            container.appendChild(svg);
+        });
+    }
+
+    function generateRandomBushes(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const cw = window.innerWidth;
+        const numBushes = Math.max(6, Math.floor(cw / 50)) + Math.floor(Math.random() * 3);
+        const positions = [];
+        const colors = ['#3a6b2a','#4a7a35','#2d5a22','#5a8a45','#3d7030','#4d8040','#35652b','#527a3d'];
+        const leafColors = ['rgba(120,200,90,0.6)','rgba(90,170,60,0.5)','rgba(150,210,100,0.4)','rgba(80,150,50,0.5)'];
+
+        function genPath(w, h) {
+            const nl = 4 + Math.floor(Math.random() * 4);
+            const pts = [];
+            for (let i = 0; i < nl; i++) {
+                const x = w * 0.05 + w * 0.9 * (i / (nl - 1));
+                const ph = h * (0.15 + Math.random() * 0.45);
+                const nd = 3 + Math.floor(Math.random() * 3);
+                for (let j = 0; j < nd; j++) {
+                    pts.push({ x: x + (Math.random() - 0.5) * (w / nl) * 0.8, y: ph + Math.random() * h * 0.2 });
+                }
+            }
+            pts.sort((a, b) => a.x - b.x);
+            const lh = h * (0.4 + Math.random() * 0.3);
+            let d = `M0,${h} C${w*0.02},${h*0.7} ${w*0.03},${lh+h*0.1} ${w*0.05},${lh}`;
+            let px = w * 0.05, py = lh;
+            for (const p of pts) {
+                const c1x = px + (p.x-px)*0.3, c1y = py + (Math.random()-0.5)*h*0.3;
+                const c2x = px + (p.x-px)*0.7, c2y = p.y + (Math.random()-0.5)*h*0.2;
+                d += ` C${c1x},${c1y} ${c2x},${c2y} ${p.x},${p.y}`;
+                px = p.x; py = p.y;
+            }
+            const rh = h * (0.4 + Math.random() * 0.3);
+            d += ` C${w*0.97},${rh+h*0.1} ${w*0.98},${h*0.7} ${w},${h} Z`;
+            return d;
+        }
+
+        for (let i = 0; i < numBushes; i++) {
+            let pos, a = 0;
+            do { pos = Math.floor(Math.random() * cw); a++; }
+            while (positions.some(p => Math.abs(p - pos) < 20) && a < 50);
+            if (a >= 50) continue;
+            positions.push(pos);
+            const bw = 20 + Math.random() * 30, bh = bw * (0.4 + Math.random() * 0.3);
+            const col = colors[Math.floor(Math.random() * colors.length)];
+            const vbW = 200, vbH = 120;
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'bush');
+            svg.setAttribute('width', bw); svg.setAttribute('height', bh);
+            svg.setAttribute('viewBox', `0 0 ${vbW} ${vbH}`);
+            svg.setAttribute('preserveAspectRatio', 'none');
+            svg.style.left = pos + 'px';
+            const p1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            p1.setAttribute('d', genPath(vbW, vbH)); p1.setAttribute('fill', col);
+            svg.appendChild(p1);
+            const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            p2.setAttribute('d', genPath(vbW, vbH)); p2.setAttribute('fill', col); p2.setAttribute('opacity', '0.7');
+            svg.appendChild(p2);
+            const nLeaves = 4 + Math.floor(Math.random() * 6);
+            for (let j = 0; j < nLeaves; j++) {
+                const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                c.setAttribute('cx', vbW * (0.1 + Math.random() * 0.8));
+                c.setAttribute('cy', vbH * (0.15 + Math.random() * 0.5));
+                c.setAttribute('r', 3 + Math.random() * 5);
+                c.setAttribute('fill', leafColors[Math.floor(Math.random() * leafColors.length)]);
+                svg.appendChild(c);
+            }
+            if (Math.random() > 0.5) svg.style.transform = 'scaleX(-1)';
+            if (Math.random() < 0.4) svg.classList.add('has-squirrel');
+            svg.addEventListener('click', () => spawnSquirrel(svg));
+            container.appendChild(svg);
+        }
+    }
+
+    let nutCursorValue = null;
+    function initNutCursor() {
+        const img = new Image();
+        img.onload = () => {
+            const c = document.createElement('canvas'); c.width = 32; c.height = 32;
+            c.getContext('2d').drawImage(img, 0, 0, 32, 32);
+            nutCursorValue = `url(${c.toDataURL('image/png')}) 16 16, pointer`;
+            document.querySelectorAll('.bush.has-squirrel').forEach(b => b.style.cursor = nutCursorValue);
+        };
+        img.src = 'icons8-nuss-100.png';
+    }
+
+    function spawnSquirrel(clickedBush) {
+        if (!clickedBush.classList.contains('has-squirrel')) return;
+        const bc = clickedBush.parentElement;
+        if (!bc || clickedBush.dataset.squirrelActive) return;
+        clickedBush.dataset.squirrelActive = '1';
+        clickedBush.classList.remove('has-squirrel');
+        clickedBush.style.cursor = '';
+        const allBushes = Array.from(bc.querySelectorAll('.bush'));
+        const cx = parseFloat(clickedBush.style.left), cw2 = parseFloat(clickedBush.getAttribute('width'));
+        let target = null, td = Infinity;
+        allBushes.forEach(b => {
+            if (b === clickedBush) return;
+            const bw2 = parseFloat(b.getAttribute('width'));
+            if (bw2 > cw2) { const d = Math.abs(parseFloat(b.style.left) - cx); if (d < td) { td = d; target = b; } }
+        });
+        const endX = target ? parseFloat(target.style.left) : (Math.random() > 0.5 ? window.innerWidth + 60 : -60);
+        const goRight = endX > cx;
+        const dist = Math.abs(endX - cx), dur = (dist / 120) * 1000;
+        const hdr = clickedBush.closest('header');
+        const sq = document.createElement('div');
+        sq.className = 'squirrel';
+        if (!goRight) sq.classList.add('face-left');
+        sq.style.left = cx + 'px';
+        hdr.appendChild(sq);
+        const an = sq.animate([{ left: cx + 'px' }, { left: endX + 'px' }], { duration: dur, easing: 'ease-in-out', fill: 'forwards' });
+        an.onfinish = () => { sq.remove(); delete clickedBush.dataset.squirrelActive; if (target) { target.classList.add('has-squirrel'); if (nutCursorValue) target.style.cursor = nutCursorValue; } };
+    }
+
+    function generateBirds(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const w = window.innerWidth;
+        const n = 3 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < n; i++) {
+            const bird = document.createElement('div');
+            bird.className = 'bird';
+            const goRight = i === 0 ? true : (i === 1 ? false : Math.random() > 0.5);
+            const startX = goRight ? (-20 - Math.random() * 100) : (w + 20 + Math.random() * 100);
+            const flapSpd = 0.4 + Math.random() * 0.4;
+            const sc = 1 + Math.random() * 1;
+            const baseDur = 30 / sc + Math.random() * 5;
+            const flyDur = goRight ? baseDur * 1.5 : baseDur;
+            const flyAnim = goRight ? 'bird-fly-ltr' : 'bird-fly-rtl';
+            const flip = goRight ? 'transform:scaleX(-1);' : '';
+            const sy = 5 + Math.random() * 50;
+            bird.style.cssText = `left:${startX}px;top:${sy}px;animation:bird-flap ${flapSpd}s steps(9) infinite,${flyAnim} ${flyDur}s linear infinite;animation-delay:0s,${-Math.random()*flyDur}s;scale:${sc};${flip}`;
+            bird.dataset.originalTop = sy;
+            container.appendChild(bird);
+        }
+    }
+
+    // Init
+    initNutCursor();
+    const cfg = loadConfig();
+    SLIDER_IDS.forEach(id => {
+        const key = ID_MAP[id];
+        document.getElementById(id).value = cfg[key];
+        document.getElementById(id + '-val').textContent = cfg[key] + getSuffix(id);
+    });
+    applyConfig(cfg);
+    generateMountains('header-mountains');
+    generateRandomTrees('header-trees');
+    generateRandomBushes('header-bushes');
+    generateRandomClouds('header-clouds');
+    generateBirds('header-birds');
+    document.querySelector('header').classList.add('force-night');
+</script>
+</body>
+</html>

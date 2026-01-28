@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="100%" height="100%" viewBox="0 0 417 417" version="1.1" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <defs>
+        <filter id="window-glow">
+            <feGaussianBlur stdDeviation="6" result="blur"/>
+            <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+    <g transform="matrix(4.16667,0,0,4.16667,0,0)" filter="url(#window-glow)">
+        <g>
+            <path d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877L22.193,59.156Z" style="fill:rgba(255,245,180,0.85);"/>
+            <path d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926L22.013,44.928Z" style="fill:rgba(255,245,180,0.85);"/>
+        </g>
+        <g>
+            <g transform="matrix(1,0,0,1,35.5406,0.261878)">
+                <path d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877L22.193,59.156Z" style="fill:rgba(255,245,180,0.85);"/>
+            </g>
+            <g transform="matrix(1,0,0,1,35.5406,0.261878)">
+                <path d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926L22.013,44.928Z" style="fill:rgba(255,245,180,0.85);"/>
+            </g>
+        </g>
+    </g>
+</svg>

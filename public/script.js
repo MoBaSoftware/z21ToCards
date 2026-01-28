@@ -11,6 +11,7 @@ let currentLang = 'de';
 const STORAGE_KEY = 'z21cards-settings';
 const PRINTED_LOKS_KEY = 'z21cards-printed-loks';
 const LANG_KEY = 'z21cards-language';
+const TRAIN_CONFIG_KEY = 'z21cards-train-config';
 
 // ==================== Internationalization ====================
 
@@ -304,6 +305,484 @@ function generateRandomTrees(containerId) {
     }
 }
 
+// ==================== Random Window Flicker ====================
+
+function startWindowFlicker() {
+    const groups = document.querySelectorAll('.window-group');
+    if (!groups.length) return;
+
+    // Randomly set some window groups dim or off initially
+    groups.forEach(g => {
+        const r = Math.random();
+        if (r < 0.15) g.classList.add('off');
+        else if (r < 0.3) g.classList.add('dim');
+    });
+
+    // Periodically toggle random window groups
+    setInterval(() => {
+        const g = groups[Math.floor(Math.random() * groups.length)];
+        g.classList.remove('off', 'dim');
+        const r = Math.random();
+        if (r < 0.1) g.classList.add('off');
+        else if (r < 0.25) g.classList.add('dim');
+    }, 2000 + Math.random() * 3000);
+}
+
+// ==================== Random Clouds ====================
+
+function generateRandomClouds(containerId) {
+    const cloudsContainer = document.getElementById(containerId);
+    if (!cloudsContainer) return;
+
+    const isHeader = containerId === 'header-clouds';
+    const containerWidth = isHeader ? window.innerWidth : 300;
+
+    // Cloud colors - different gray and white tones
+    const cloudColors = [
+        'rgba(255, 255, 255, 0.8)',  // white
+        'rgba(245, 245, 245, 0.75)', // off-white
+        'rgba(220, 220, 220, 0.7)',  // light gray
+        'rgba(200, 200, 200, 0.65)', // medium light gray
+        'rgba(180, 180, 180, 0.6)',  // gray
+        'rgba(230, 235, 240, 0.7)',  // bluish white
+    ];
+
+    // Calculate number of clouds based on width (like trees, but divided by 3)
+    const numTrees = Math.max(6, Math.floor(containerWidth / 50)) + Math.floor(Math.random() * 3);
+    const numClouds = Math.max(3, Math.floor(numTrees / 3));
+
+    for (let i = 0; i < numClouds; i++) {
+        const cloud = document.createElement('div');
+        cloud.className = 'cloud';
+
+        // Random size (40-120px wide, aspect ratio ~2:1)
+        const width = 40 + Math.random() * 80;
+        const height = width * (0.4 + Math.random() * 0.2);
+
+        // Clouds start at right edge - animation brings them in from right
+        const startX = containerWidth + 50 + Math.random() * 100;
+        // Header clouds: spread across full height (0-60px from top)
+        // Loading clouds: higher up (-60 to -20px)
+        const startY = isHeader ? (Math.random() * 60) : (-60 + Math.random() * 40);
+
+        // Random speed - slower (35-55 seconds for full traverse)
+        const duration = 35 + Math.random() * 20;
+
+        // Negative delay for initial random distribution across screen
+        const initialDelay = -Math.random() * duration;
+
+        // Random color
+        const color = cloudColors[Math.floor(Math.random() * cloudColors.length)];
+
+        // Create fluffy cloud shape with multiple circles
+        const gradients = [];
+        const numCircles = 3 + Math.floor(Math.random() * 3);
+        for (let j = 0; j < numCircles; j++) {
+            const cx = 20 + Math.random() * 60; // percentage
+            const cy = 30 + Math.random() * 40;
+            const size = 30 + Math.random() * 40;
+            gradients.push(`radial-gradient(ellipse ${size}% ${size * 0.8}% at ${cx}% ${cy}%, ${color} 0%, transparent 70%)`);
+        }
+
+        cloud.style.cssText = `
+            width: ${width}px;
+            height: ${height}px;
+            left: ${startX}px;
+            top: ${startY}px;
+            background: ${gradients.join(', ')};
+            animation-duration: ${duration}s;
+            animation-delay: ${initialDelay}s;
+        `;
+
+        cloudsContainer.appendChild(cloud);
+    }
+}
+
+// ==================== Birds ====================
+
+function generateBirds(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const containerWidth = window.innerWidth;
+    const numBirds = 3 + Math.floor(Math.random() * 3); // 3-5 birds
+
+    for (let i = 0; i < numBirds; i++) {
+        const bird = document.createElement('div');
+        bird.className = 'bird';
+
+        // Ensure at least one bird flies each direction
+        const goRight = i === 0 ? true : (i === 1 ? false : Math.random() > 0.5);
+        const startX = goRight ? (-20 - Math.random() * 100) : (containerWidth + 20 + Math.random() * 100);
+        const startY = 5 + Math.random() * 50;
+        const scale = 1 + Math.random() * 1; // 1x-2x
+
+        // Depth effect: bigger birds (closer) fly faster
+        // Base duration inversely proportional to scale
+        const baseDuration = 30 / scale + Math.random() * 5; // scale=2 -> ~15-20s, scale=1 -> ~30-35s
+        // Headwind: LTR birds fly slower (factor 1.5x)
+        const flyDuration = goRight ? baseDuration * 1.5 : baseDuration;
+
+        const flapSpeed = 0.4 + Math.random() * 0.4;
+        const initialDelay = -Math.random() * flyDuration;
+        const flyAnim = goRight ? 'bird-fly-ltr' : 'bird-fly-rtl';
+        const flip = goRight ? 'transform:scaleX(-1);' : '';
+
+        bird.style.cssText = `
+            left: ${startX}px;
+            top: ${startY}px;
+            animation: bird-flap ${flapSpeed}s steps(9) infinite, ${flyAnim} ${flyDuration}s linear infinite;
+            animation-delay: 0s, ${initialDelay}s;
+            scale: ${scale};
+            ${flip}
+        `;
+        bird.dataset.originalTop = startY;
+
+        container.appendChild(bird);
+    }
+}
+
+function initBirdDodge() {
+    const dodgeRadius = 80;
+    const dodgeAmount = 40;
+    let frame = null;
+
+    document.addEventListener('mousemove', (e) => {
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+            const birds = document.querySelectorAll('.bird');
+            birds.forEach(bird => {
+                const rect = bird.getBoundingClientRect();
+                const bx = rect.left + rect.width / 2;
+                const by = rect.top + rect.height / 2;
+                const dx = e.clientX - bx;
+                const dy = e.clientY - by;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const origTop = parseFloat(bird.dataset.originalTop);
+
+                if (dist < dodgeRadius) {
+                    // Fly away from cursor vertically
+                    const dodgeDir = dy > 0 ? -1 : 1;
+                    const intensity = 1 - (dist / dodgeRadius);
+                    const newTop = Math.max(0, origTop + dodgeDir * dodgeAmount * intensity);
+                    bird.style.top = newTop + 'px';
+                    bird.dataset.dodging = '1';
+                } else if (bird.dataset.dodging) {
+                    bird.style.top = origTop + 'px';
+                    delete bird.dataset.dodging;
+                }
+            });
+            frame = null;
+        });
+    });
+}
+
+// ==================== Mountain Landscape ====================
+
+function generateMountains(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const w = window.innerWidth;
+
+    const layers = [
+        { color: '#7a8ea8', maxH: 85, peaks: 5 + Math.floor(Math.random() * 2), zIndex: 1 },
+        { color: '#5a7055', maxH: 60, peaks: 7 + Math.floor(Math.random() * 2), zIndex: 2 },
+        { color: '#3d5535', maxH: 40, peaks: 9 + Math.floor(Math.random() * 2), zIndex: 3 },
+    ];
+
+    layers.forEach(layer => {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'mountain-layer');
+        svg.setAttribute('viewBox', `0 0 ${w} ${layer.maxH}`);
+        svg.setAttribute('preserveAspectRatio', 'none');
+        svg.style.height = layer.maxH + 'px';
+        svg.style.zIndex = layer.zIndex;
+
+        let d = `M0,${layer.maxH}`;
+        const segW = w / layer.peaks;
+
+        for (let i = 0; i < layer.peaks; i++) {
+            const x1 = i * segW;
+            const x2 = x1 + segW / 2;
+            const x3 = x1 + segW;
+            const valleyH = layer.maxH * (0.6 + Math.random() * 0.3);
+            const peakH = layer.maxH * (0.1 + Math.random() * 0.35);
+            const cp1x = x1 + segW * 0.25;
+            const cp2x = x1 + segW * 0.35;
+            const cp3x = x2 + segW * 0.15;
+            const cp4x = x2 + segW * 0.25;
+
+            d += ` C${cp1x},${valleyH} ${cp2x},${peakH} ${x2},${peakH}`;
+            d += ` C${cp3x},${peakH} ${cp4x},${valleyH} ${x3},${valleyH}`;
+        }
+
+        d += ` L${w},${layer.maxH} Z`;
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('fill', layer.color);
+        svg.appendChild(path);
+        container.appendChild(svg);
+    });
+}
+
+// ==================== Random Bushes ====================
+
+function generateRandomBushes(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const containerWidth = window.innerWidth;
+
+    // Same count as trees
+    const numBushes = Math.max(6, Math.floor(containerWidth / 50)) + Math.floor(Math.random() * 3);
+    const minSpacing = 20;
+    const positions = [];
+
+    const bushColors = [
+        '#3a6b2a', '#4a7a35', '#2d5a22', '#5a8a45',
+        '#3d7030', '#4d8040', '#35652b', '#527a3d',
+    ];
+
+    const leafColors = [
+        'rgba(120, 200, 90, 0.6)',
+        'rgba(90, 170, 60, 0.5)',
+        'rgba(150, 210, 100, 0.4)',
+        'rgba(80, 150, 50, 0.5)',
+    ];
+
+    // Generate a random organic bush silhouette path
+    function generateBushPath(w, h) {
+        // Create an irregular, jagged bush outline with multiple lobes
+        const numLobes = 4 + Math.floor(Math.random() * 4); // 4-7 lobes
+        const points = [];
+
+        // Generate lobe peaks along the top
+        for (let i = 0; i < numLobes; i++) {
+            const x = (w * 0.05) + (w * 0.9) * (i / (numLobes - 1));
+            const peakH = h * (0.15 + Math.random() * 0.45);
+            // Each lobe has a peak and surrounding detail points
+            const numDetail = 3 + Math.floor(Math.random() * 3);
+            for (let j = 0; j < numDetail; j++) {
+                const dx = x + (Math.random() - 0.5) * (w / numLobes) * 0.8;
+                const dy = peakH + Math.random() * h * 0.2;
+                points.push({ x: dx, y: dy });
+            }
+        }
+
+        // Sort by x
+        points.sort((a, b) => a.x - b.x);
+
+        // Build path: start at bottom-left, go up along left, across top with lobes, down right, back along bottom
+        let d = `M0,${h}`;
+
+        // Left side rise
+        const leftH = h * (0.4 + Math.random() * 0.3);
+        d += ` C${w * 0.02},${h * 0.7} ${w * 0.03},${leftH + h * 0.1} ${w * 0.05},${leftH}`;
+
+        // Across the top with jagged lobes using cubic beziers
+        let prevX = w * 0.05;
+        let prevY = leftH;
+        for (let i = 0; i < points.length; i++) {
+            const p = points[i];
+            const midX = (prevX + p.x) / 2;
+            // Control points create jagged, spiky shapes
+            const cp1x = prevX + (p.x - prevX) * 0.3;
+            const cp1y = prevY + (Math.random() - 0.5) * h * 0.3;
+            const cp2x = prevX + (p.x - prevX) * 0.7;
+            const cp2y = p.y + (Math.random() - 0.5) * h * 0.2;
+            d += ` C${cp1x},${cp1y} ${cp2x},${cp2y} ${p.x},${p.y}`;
+            prevX = p.x;
+            prevY = p.y;
+        }
+
+        // Right side descent
+        const rightH = h * (0.4 + Math.random() * 0.3);
+        d += ` C${w * 0.97},${rightH + h * 0.1} ${w * 0.98},${h * 0.7} ${w},${h}`;
+
+        d += ' Z';
+        return d;
+    }
+
+    for (let i = 0; i < numBushes; i++) {
+        let pos;
+        let attempts = 0;
+        do {
+            pos = Math.floor(Math.random() * containerWidth);
+            attempts++;
+        } while (positions.some(p => Math.abs(p - pos) < minSpacing) && attempts < 50);
+
+        if (attempts >= 50) continue;
+        positions.push(pos);
+
+        const bushW = 20 + Math.random() * 30;
+        const bushH = bushW * (0.4 + Math.random() * 0.3);
+        const color = bushColors[Math.floor(Math.random() * bushColors.length)];
+        const flip = Math.random() > 0.5;
+
+        const vbW = 200;
+        const vbH = 120;
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'bush');
+        svg.setAttribute('width', bushW);
+        svg.setAttribute('height', bushH);
+        svg.setAttribute('viewBox', `0 0 ${vbW} ${vbH}`);
+        svg.setAttribute('preserveAspectRatio', 'none');
+        svg.style.left = pos + 'px';
+
+        // Main bush silhouette
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', generateBushPath(vbW, vbH));
+        path.setAttribute('fill', color);
+        svg.appendChild(path);
+
+        // Second overlapping layer for more depth (slightly lighter/darker)
+        const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path2.setAttribute('d', generateBushPath(vbW, vbH));
+        path2.setAttribute('fill', color);
+        path2.setAttribute('opacity', '0.7');
+        svg.appendChild(path2);
+
+        // Leaf texture - small circles scattered over the bush
+        const numLeaves = 4 + Math.floor(Math.random() * 6);
+        for (let j = 0; j < numLeaves; j++) {
+            const lx = vbW * (0.1 + Math.random() * 0.8);
+            const ly = vbH * (0.15 + Math.random() * 0.5);
+            const lr = 3 + Math.random() * 5;
+            const leafColor = leafColors[Math.floor(Math.random() * leafColors.length)];
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', lx);
+            circle.setAttribute('cy', ly);
+            circle.setAttribute('r', lr);
+            circle.setAttribute('fill', leafColor);
+            svg.appendChild(circle);
+        }
+
+        // Random horizontal flip for variety
+        if (flip) {
+            svg.style.transform = 'scaleX(-1)';
+        }
+
+        // Randomly assign squirrels to ~40% of bushes
+        if (Math.random() < 0.4) {
+            svg.classList.add('has-squirrel');
+            if (nutCursorValue) svg.style.cursor = nutCursorValue;
+        }
+
+        // Click handler: spawn a squirrel
+        svg.addEventListener('click', () => spawnSquirrel(svg));
+
+        container.appendChild(svg);
+    }
+}
+
+// ==================== Squirrel ====================
+
+// Create a scaled-down nut cursor from the 100x100 icon
+let nutCursorValue = null;
+
+function initNutCursor() {
+    const img = new Image();
+    img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, 32, 32);
+        const dataUrl = canvas.toDataURL('image/png');
+        nutCursorValue = `url(${dataUrl}) 16 16, pointer`;
+        applyNutCursors();
+    };
+    img.src = 'icons8-nuss-100.png';
+}
+
+function applyNutCursors() {
+    if (!nutCursorValue) return;
+    document.querySelectorAll('.bush.has-squirrel').forEach(bush => {
+        bush.style.cursor = nutCursorValue;
+    });
+}
+
+function spawnSquirrel(clickedBush) {
+    // Only spawn from bushes that have a squirrel
+    if (!clickedBush.classList.contains('has-squirrel')) return;
+
+    const bushesContainer = clickedBush.parentElement;
+    if (!bushesContainer) return;
+
+    // Prevent spawning multiple squirrels at once from same bush
+    if (clickedBush.dataset.squirrelActive) return;
+    clickedBush.dataset.squirrelActive = '1';
+
+    // Remove squirrel from this bush
+    clickedBush.classList.remove('has-squirrel');
+    clickedBush.style.cursor = '';
+
+    const allBushes = Array.from(bushesContainer.querySelectorAll('.bush'));
+    const clickedX = parseFloat(clickedBush.style.left);
+    const clickedW = parseFloat(clickedBush.getAttribute('width'));
+
+    // Find the nearest bigger bush
+    let target = null;
+    let targetDist = Infinity;
+    allBushes.forEach(bush => {
+        if (bush === clickedBush) return;
+        const bw = parseFloat(bush.getAttribute('width'));
+        if (bw > clickedW) {
+            const bx = parseFloat(bush.style.left);
+            const dist = Math.abs(bx - clickedX);
+            if (dist < targetDist) {
+                targetDist = dist;
+                target = bush;
+            }
+        }
+    });
+
+    const startX = clickedX;
+    let endX;
+    if (target) {
+        endX = parseFloat(target.style.left);
+    } else {
+        // No bigger bush: run off-screen (random direction)
+        endX = Math.random() > 0.5 ? window.innerWidth + 60 : -60;
+    }
+
+    const goRight = endX > startX;
+    const distance = Math.abs(endX - startX);
+    const speed = 120; // px per second
+    const duration = (distance / speed) * 1000;
+
+    // Spawn squirrel in header (not in bushes container) to avoid overflow clipping
+    const header = clickedBush.closest('header');
+    const squirrel = document.createElement('div');
+    squirrel.className = 'squirrel';
+    if (!goRight) squirrel.classList.add('face-left');
+    squirrel.style.left = startX + 'px';
+    header.appendChild(squirrel);
+
+    // Animate to target
+    const anim = squirrel.animate([
+        { left: startX + 'px' },
+        { left: endX + 'px' }
+    ], {
+        duration: duration,
+        easing: 'ease-in-out',
+        fill: 'forwards'
+    });
+
+    anim.onfinish = () => {
+        squirrel.remove();
+        delete clickedBush.dataset.squirrelActive;
+        // Squirrel hides in the target bush
+        if (target) {
+            target.classList.add('has-squirrel');
+            if (nutCursorValue) target.style.cursor = nutCursorValue;
+        }
+    };
+}
+
 // ==================== Initialization ====================
 
 async function initApp() {
@@ -314,8 +793,43 @@ async function initApp() {
     currentLang = detectLanguage();
     document.documentElement.lang = currentLang;
 
-    // Generate random trees for loading screen
+    // Load train config - try JSON file first, fall back to localStorage
+    function applyTrainConfig(cfg) {
+        const root = document.documentElement.style;
+        if (cfg.hlTop !== undefined) root.setProperty('--headlight-top', cfg.hlTop + 'px');
+        if (cfg.hlRight !== undefined) root.setProperty('--headlight-right', cfg.hlRight + 'px');
+        if (cfg.hl2Top !== undefined) root.setProperty('--headlight2-top', cfg.hl2Top + 'px');
+        if (cfg.hl2Right !== undefined) root.setProperty('--headlight2-right', cfg.hl2Right + 'px');
+        if (cfg.coneSpread !== undefined) root.setProperty('--cone-spread', cfg.coneSpread + 'px');
+        if (cfg.coneOpacity !== undefined) root.setProperty('--cone-opacity', cfg.coneOpacity / 100);
+        if (cfg.wlTop !== undefined) root.setProperty('--wagon-light-top', cfg.wlTop + 'px');
+        if (cfg.wlLeft !== undefined) root.setProperty('--wagon-light-left', cfg.wlLeft + 'px');
+        if (cfg.winTop !== undefined) root.setProperty('--window-top', cfg.winTop + 'px');
+        if (cfg.winWidth !== undefined) root.setProperty('--window-width', cfg.winWidth + 'px');
+        if (cfg.winHeight !== undefined) root.setProperty('--window-height', cfg.winHeight + 'px');
+        if (cfg.winLeft !== undefined) root.setProperty('--window-left', cfg.winLeft + 'px');
+        if (cfg.wagSpacing !== undefined) root.setProperty('--wagon-spacing', cfg.wagSpacing + 'px');
+        if (cfg.winMaskX !== undefined) root.setProperty('--window-mask-x', cfg.winMaskX + 'px');
+        if (cfg.winMaskY !== undefined) root.setProperty('--window-mask-y', cfg.winMaskY + 'px');
+        if (cfg.winMaskScale !== undefined) root.setProperty('--window-mask-scale', cfg.winMaskScale / 100);
+        if (cfg.fireMaskX !== undefined) root.setProperty('--fire-mask-x', cfg.fireMaskX + 'px');
+        if (cfg.fireMaskY !== undefined) root.setProperty('--fire-mask-y', cfg.fireMaskY + 'px');
+        if (cfg.fireMaskScale !== undefined) root.setProperty('--fire-mask-scale', cfg.fireMaskScale / 100);
+    }
+    try {
+        fetch('train-config.json').then(r => r.ok ? r.json() : Promise.reject()).then(applyTrainConfig)
+            .catch(() => {
+                const stored = localStorage.getItem(TRAIN_CONFIG_KEY);
+                if (stored) applyTrainConfig(JSON.parse(stored));
+            });
+    } catch (e) {}
+
+    // Load nut cursor for squirrel bushes
+    initNutCursor();
+
+    // Generate random trees and clouds for loading screen
     generateRandomTrees('trees');
+    generateRandomClouds('loading-clouds');
 
     const loadingScreen = document.getElementById('loading-screen');
     const loadingText = document.querySelector('.loading-text');
@@ -341,9 +855,15 @@ async function initApp() {
         updateAllTranslations();
         setupLanguageSwitcher();
 
-        // Generate trees for header and set train speed (after app is visible so we can measure width)
+        // Generate mountains, trees, bushes and clouds for header and set train speed (after app is visible so we can measure width)
         setTimeout(() => {
+            generateMountains('header-mountains');
             generateRandomTrees('header-trees');
+            generateRandomBushes('header-bushes');
+            generateRandomClouds('header-clouds');
+            generateBirds('header-birds');
+            initBirdDodge();
+            startWindowFlicker();
             setHeaderTrainSpeed();
         }, 10);
 

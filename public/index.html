@@ -12,6 +12,7 @@
 <body>
 <!-- Loading Screen -->
 <div id="loading-screen">
+    <div class="clouds" id="loading-clouds"></div>
     <div class="loading-content">
         <div class="track">
             <div class="trees" id="trees"></div>
@@ -44,15 +45,77 @@
             <button class="lang-btn" data-lang="la" title="Latina">🏛️</button>
         </div>
         <h1 data-i18n="title">Lok-Karten Generator</h1>
+        <div class="sky" id="header-sky">
+            <div class="sun"></div>
+            <div class="moon"></div>
+        </div>
+        <div class="clouds" id="header-clouds"></div>
+        <div class="birds" id="header-birds"></div>
+        <div class="night-overlay"></div>
+        <div class="mountains" id="header-mountains"></div>
         <div class="header-track">
             <div class="trees" id="header-trees"></div>
             <div class="track-line"></div>
             <div class="train">
-                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
-                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
-                <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                <div class="wagon-wrapper">
+                    <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                    <svg class="wagon-windows-svg" viewBox="0 0 417 417" xmlns="http://www.w3.org/2000/svg">
+                        <defs><filter id="wg"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        <g transform="matrix(4.16667,0,0,4.16667,0,0)" filter="url(#wg)">
+                            <g class="window-group">
+                                <path class="window-pane" d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877Z"/>
+                                <path class="window-pane" d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926Z"/>
+                            </g>
+                            <g class="window-group" transform="translate(35.5406,0.261878)">
+                                <path class="window-pane" d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877Z"/>
+                                <path class="window-pane" d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926Z"/>
+                            </g>
+                        </g>
+                    </svg>
+                    <div class="wagon-light tail-light"></div>
+                </div>
+                <div class="wagon-wrapper">
+                    <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                    <svg class="wagon-windows-svg" viewBox="0 0 417 417" xmlns="http://www.w3.org/2000/svg">
+                        <defs><filter id="wg2"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        <g transform="matrix(4.16667,0,0,4.16667,0,0)" filter="url(#wg2)">
+                            <g class="window-group">
+                                <path class="window-pane" d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877Z"/>
+                                <path class="window-pane" d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926Z"/>
+                            </g>
+                            <g class="window-group" transform="translate(35.5406,0.261878)">
+                                <path class="window-pane" d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877Z"/>
+                                <path class="window-pane" d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926Z"/>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+                <div class="wagon-wrapper">
+                    <img src="icons8-eisenbahnwaggon-100.png" class="wagon" alt="Waggon">
+                    <svg class="wagon-windows-svg" viewBox="0 0 417 417" xmlns="http://www.w3.org/2000/svg">
+                        <defs><filter id="wg3"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        <g transform="matrix(4.16667,0,0,4.16667,0,0)" filter="url(#wg3)">
+                            <g class="window-group">
+                                <path class="window-pane" d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877Z"/>
+                                <path class="window-pane" d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926Z"/>
+                            </g>
+                            <g class="window-group" transform="translate(35.5406,0.261878)">
+                                <path class="window-pane" d="M22.193,59.156L22.007,48.146L44.069,48.165L44.168,58.877Z"/>
+                                <path class="window-pane" d="M22.013,44.928L22.067,40.917L23.091,40.051L43.971,39.938L45.145,41.014L45.116,44.926Z"/>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
                 <div class="locomotive-container">
                     <img src="icons8-lokomotive-emoji-100.png" class="locomotive" alt="Lokomotive">
+                    <svg class="loco-fire-svg" viewBox="0 0 417 417" xmlns="http://www.w3.org/2000/svg">
+                        <defs><filter id="fire-glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        <g transform="matrix(4.16667,0,0,4.16667,0,0)" filter="url(#fire-glow)">
+                            <path class="fire-pane" d="M14.007,43.225L13.946,50.564L31.699,51.303L32.634,50.174L32.577,44.576L31.244,42.809C31.244,42.809 9.99,42.059 14.007,43.225"/>
+                        </g>
+                    </svg>
+                    <div class="headlight"></div>
+                    <div class="headlight headlight-2"></div>
                     <div class="smoke-container">
                         <div class="smoke-puff"></div>
                         <div class="smoke-puff"></div>
@@ -60,7 +123,9 @@
                     </div>
                 </div>
             </div>
+            <div class="bushes" id="header-bushes"></div>
         </div>
+        <div class="grass"></div>
         <button id="reset-upload-btn" class="hidden" data-i18n="resetUpload">Neue Datei hochladen</button>
         <a href="https://icons8.com" target="_blank" class="icons8-link header-icons8">Icons by Icons8</a>
     </header>

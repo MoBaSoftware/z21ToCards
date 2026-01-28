@@ -1,3 +1,20 @@
+/* Animatable sky color properties */
+@property --sky-top {
+    syntax: '<color>';
+    initial-value: #0a0a1a;
+    inherits: false;
+}
+@property --sky-mid {
+    syntax: '<color>';
+    initial-value: #1a1a2e;
+    inherits: false;
+}
+@property --sky-bottom {
+    syntax: '<color>';
+    initial-value: #1a1a2e;
+    inherits: false;
+}
+
 /* ==================== Industrial/Modern Design ==================== */
 
 :root {
@@ -21,12 +38,182 @@ body {
 
 /* ==================== Header ==================== */
 header {
-    background: var(--primary-color);
+    background: #1a1a2e;
     color: white;
     text-align: center;
-    padding: 2rem 1rem;
+    padding: 2rem 1rem 0;
     position: relative;
     border-bottom: 4px solid var(--secondary-color);
+    overflow: hidden;
+}
+
+/* ==================== Day-Night Cycle ==================== */
+.sky {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background: linear-gradient(to bottom, var(--sky-top), var(--sky-mid), var(--sky-bottom));
+    animation: sky-cycle 60s ease-in-out infinite;
+}
+
+@keyframes sky-cycle {
+    0%, 100% { --sky-top: #0a0a1a; --sky-mid: #1a1a2e; --sky-bottom: #1a1a2e; }
+    5%       { --sky-top: #0f0f24; --sky-mid: #1f1535; --sky-bottom: #2a1a3a; }
+    10%      { --sky-top: #1a1a2e; --sky-mid: #c06848; --sky-bottom: #e8a060; }
+    14%      { --sky-top: #4a3080; --sky-mid: #d06050; --sky-bottom: #ffd060; }
+    18%      { --sky-top: #3a70b0; --sky-mid: #6aace0; --sky-bottom: #a0d0e8; }
+    25%      { --sky-top: #2e6bba; --sky-mid: #5da1e0; --sky-bottom: #87ceeb; }
+    50%      { --sky-top: #2e6bba; --sky-mid: #5da1e0; --sky-bottom: #87ceeb; }
+    58%      { --sky-top: #3a70b0; --sky-mid: #6aace0; --sky-bottom: #a0d0e8; }
+    66%      { --sky-top: #5a4090; --sky-mid: #c06050; --sky-bottom: #f0a060; }
+    72%      { --sky-top: #2d1b4e; --sky-mid: #a03050; --sky-bottom: #e89050; }
+    80%      { --sky-top: #1a1a2e; --sky-mid: #2d1b4e; --sky-bottom: #3d2050; }
+    90%      { --sky-top: #0a0a1a; --sky-mid: #1a1a2e; --sky-bottom: #1a1a2e; }
+}
+
+.sun {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    background: radial-gradient(circle, #fff6a0 0%, #ffd700 40%, #ff8c00 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 20px 8px rgba(255, 200, 50, 0.5), 0 0 60px 20px rgba(255, 150, 0, 0.2);
+    z-index: 1;
+    animation: sun-path 60s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes sun-path {
+    0%   { left: 5%;  top: 105%; opacity: 0; }
+    8%   { left: 10%; top: 90%;  opacity: 0.4; }
+    12%  { left: 15%; top: 50%;  opacity: 0.8; }
+    16%  { left: 20%; top: 25%;  opacity: 1; }
+    25%  { left: 32%; top: 10%;  opacity: 1; }
+    38%  { left: 48%; top: 5%;   opacity: 1; }
+    50%  { left: 60%; top: 10%;  opacity: 1; }
+    60%  { left: 72%; top: 25%;  opacity: 1; }
+    66%  { left: 80%; top: 50%;  opacity: 0.8; }
+    72%  { left: 87%; top: 85%;  opacity: 0.4; }
+    78%  { left: 92%; top: 105%; opacity: 0; }
+    100% { left: 5%;  top: 105%; opacity: 0; }
+}
+
+.moon {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    background: radial-gradient(circle at 35% 40%, transparent 40%, #e8e8d0 42%, #f5f5e0 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 12px 4px rgba(200, 200, 180, 0.3), 0 0 40px 10px rgba(200, 200, 180, 0.1);
+    z-index: 1;
+    animation: moon-path 60s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes moon-path {
+    0%   { left: 40%; top: 10%;  opacity: 0.9; }
+    3%   { left: 50%; top: 15%;  opacity: 0.8; }
+    6%   { left: 60%; top: 30%;  opacity: 0.5; }
+    10%  { left: 70%; top: 60%;  opacity: 0.2; }
+    13%  { left: 78%; top: 105%; opacity: 0; }
+    18%  { left: 85%; top: 110%; opacity: 0; }
+    72%  { left: 5%;  top: 110%; opacity: 0; }
+    78%  { left: 10%; top: 80%;  opacity: 0.2; }
+    82%  { left: 18%; top: 50%;  opacity: 0.5; }
+    86%  { left: 24%; top: 25%;  opacity: 0.7; }
+    92%  { left: 32%; top: 10%;  opacity: 0.9; }
+    100% { left: 40%; top: 10%;  opacity: 0.9; }
+}
+
+/* Night overlay - blue filter */
+@property --night-opacity {
+    syntax: '<number>';
+    initial-value: 0;
+    inherits: false;
+}
+
+.night-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 50%, rgba(10, 15, 40, 0.6) 0%, rgba(5, 8, 25, 0.8) 100%);
+    z-index: 3;
+    pointer-events: none;
+    opacity: var(--night-opacity);
+    animation: night-filter 60s ease-in-out infinite;
+    mix-blend-mode: multiply;
+}
+
+@keyframes night-filter {
+    0%   { --night-opacity: 0.7; }
+    5%   { --night-opacity: 0.5; }
+    10%  { --night-opacity: 0.3; }
+    15%  { --night-opacity: 0.1; }
+    20%  { --night-opacity: 0; }
+    55%  { --night-opacity: 0; }
+    65%  { --night-opacity: 0.1; }
+    72%  { --night-opacity: 0.3; }
+    80%  { --night-opacity: 0.5; }
+    90%  { --night-opacity: 0.7; }
+    100% { --night-opacity: 0.7; }
+}
+
+/* Train lights */
+.headlight {
+    position: absolute;
+    width: 8px;
+    height: 6px;
+    background: radial-gradient(ellipse, #fffde0 0%, #ffd700 60%, transparent 100%);
+    border-radius: 50%;
+    top: 18px;
+    right: -2px;
+    box-shadow: 0 0 8px 4px rgba(255, 253, 200, 0.6), 12px 0 25px 10px rgba(255, 240, 150, 0.3);
+    z-index: 20;
+    animation: light-glow 60s ease-in-out infinite;
+}
+
+.wagon-light {
+    position: relative;
+    width: 3px;
+    height: 3px;
+    background: #fffde0;
+    border-radius: 50%;
+    box-shadow: 0 0 6px 3px rgba(255, 253, 200, 0.5), 0 0 15px 6px rgba(255, 240, 150, 0.2);
+    top: -20px;
+    margin-left: -12px;
+    margin-right: -6px;
+    z-index: 20;
+    animation: light-glow 60s ease-in-out infinite;
+}
+
+@keyframes light-glow {
+    0%   { opacity: 0.9; }
+    5%   { opacity: 0.7; }
+    10%  { opacity: 0.4; }
+    15%  { opacity: 0.1; }
+    20%  { opacity: 0; }
+    55%  { opacity: 0; }
+    65%  { opacity: 0.1; }
+    72%  { opacity: 0.4; }
+    80%  { opacity: 0.7; }
+    90%  { opacity: 0.9; }
+    100% { opacity: 0.9; }
+}
+
+/* Grass below tracks */
+.grass {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    height: 30px;
+    background: linear-gradient(to bottom, #5a9c4a 0%, #4a8c3f 30%, #3d7a35 60%, #357030 100%);
+    z-index: 1;
+    border-top: 3px solid #6aaa55;
 }
 
 h1 {
@@ -35,6 +222,13 @@ h1 {
     font-size: 2rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
+    background: rgba(45, 52, 54, 0.7);
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    display: inline-block;
+    position: relative;
+    z-index: 3;
 }
 
 h2 {
@@ -478,6 +672,80 @@ legend {
     bottom: 5px;
     right: 10px;
     margin: 0;
+}
+
+/* Language Switcher */
+.lang-switcher {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    display: flex;
+    gap: 0.3rem;
+    background: rgba(45, 52, 54, 0.7);
+    padding: 0.4rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    z-index: 3;
+}
+
+.lang-btn {
+    padding: 0.2rem 0.4rem;
+    border: 2px solid transparent;
+    background: transparent;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 1.3rem;
+    line-height: 1;
+    transition: all 0.2s;
+    opacity: 0.5;
+}
+
+.lang-btn:hover {
+    opacity: 0.8;
+}
+
+.lang-btn.active {
+    opacity: 1;
+    border-color: var(--accent-color);
+    background: rgba(255,255,255,0.1);
+}
+
+/* ==================== Cloud Animation ==================== */
+.clouds {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+}
+
+#loading-screen .clouds {
+    height: 40%;
+}
+
+header .clouds {
+    height: 100%;
+    z-index: 2;
+}
+
+.cloud {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(2px);
+    opacity: 0.7;
+    animation: cloud-drift linear infinite;
+}
+
+@keyframes cloud-drift {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(calc(-100vw - 400px));
+    }
 }
 
 /* ==================== Track Animation ==================== */
